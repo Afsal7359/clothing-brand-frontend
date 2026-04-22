@@ -55,11 +55,18 @@ export default function DiscoverSwiper({ items = [] }) {
         grabCursor: true,
         centeredSlides: true,
         slidesPerView: 'auto',
-        speed: 700,
+        speed: 680,
         loop: true,
+        // Stacked-pages effect: prev cards go back in Z (no H overflow),
+        // next cards slide in from the right. Works with body overflow-x:hidden.
         creativeEffect: {
-          prev: { translate: ['-90%', 0, -300], scale: 0.82, opacity: 0.45, rotate: [0, 0, -5] },
-          next: { translate: ['90%', 0, -300], scale: 0.82, opacity: 0.45, rotate: [0, 0, 5] },
+          prev: {
+            shadow: true,
+            translate: [0, 0, -380],
+          },
+          next: {
+            translate: ['100%', 0, 0],
+          },
         },
         on: {
           slideChange() {

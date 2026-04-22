@@ -492,31 +492,33 @@ header.site {
 
   .discover.swiper-active {
     display: block;
+    overflow: hidden; /* Contain within page — prevents body clip from breaking the effect */
     margin: 0 calc(var(--pad) * -1);
     padding-top: 16px;
   }
-  .discover.swiper-active .swiper { overflow: visible; padding: 8px 14vw; }
+  /* overflow:hidden on swiper itself — prev slides stack in Z, next slides from right, no H overflow */
+  .discover.swiper-active .swiper { overflow: hidden; }
   .discover.swiper-active .swiper-slide {
-    width: 72vw;
-    height: min(110vw, 620px);
-    border-radius: 6px;
+    width: 82vw;
+    height: min(108vw, 600px);
+    border-radius: 10px;
     overflow: hidden;
-    transition: all 0.5s ease;
-    box-shadow: 0 10px 40px -15px rgba(0,0,0,0.4);
+    /* NO transition:all — Swiper manages its own transforms; this was breaking the effect */
+    box-shadow: 0 12px 36px -10px rgba(0,0,0,0.35);
   }
   .discover.swiper-active .discover-card { width: 100%; height: 100%; aspect-ratio: auto; }
   .discover.swiper-active .discover-card img.desktop { display: none; }
   .discover.swiper-active .discover-card img.mobile  { display: block; }
   .discover.swiper-active .discover-card img {
     transition: transform 1.2s cubic-bezier(.2,.8,.2,1);
-    transform: scale(1.12);
+    transform: scale(1.08);
   }
   .discover.swiper-active .swiper-slide-active .discover-card img { transform: scale(1); }
   .discover.swiper-active .discover-card-body {
     padding: 26px 22px;
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.55s ease 0.2s, transform 0.55s ease 0.2s;
+    transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s;
   }
   .discover.swiper-active .swiper-slide-active .discover-card-body {
     opacity: 1;

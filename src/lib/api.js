@@ -1,0 +1,90 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:5000';
+
+function getToken() {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('nv_token');
+}
+
+async function request(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  const token = getToken();
+  if (token && options.auth !== false) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers,
+    cache: options.cache || 'no-store',
+  });
+
+  if (!res.ok) {
+    let msg = `Request failed: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data?.message) msg = data.message;
+    } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+// Resolves relative upload paths to full URLs
+export function resolveImage(src) {
+  if (!src) return '';
+  if (src.startsWith('http')) return src;
+  if (src.startsWith('/uploads/')) return `${UPLOADS_URL}${src}`;
+  return src;
+}
+
+// Public
+export const api = {
+  products: {
+    list: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return request(`/products${qs ? `?${qs}` : ''}`);
+    },
+    get: (slug) => request(`/products/${slug}`),
+    create: (body) => request('/products', { method: 'POST', body: JSON.stringify(body) }),
+    update: (id, body) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+    remove: (id) => request(`/products/${id}`, { method: 'DELETE' }),
+  },
+  collections: {
+    list: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return request(`/collections${qs ? `?${qs}` : ''}`);
+    },
+    get: (slug) => request(`/collections/${slug}`),
+    create: (body) => request('/collections', { method: 'POST', body: JSON.stringify(body) }),
+    update: (id, body) => request(`/collections/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+    remove: (id) => request(`/collections/${id}`, { method: 'DELETE' }),
+  },
+  orders: {
+    create: (body) => request('/orders', { method: 'POST', body: JSON.stringify(body), auth: false }),
+    list: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return request(`/orders${qs ? `?${qs}` : ''}`);
+    },
+    get: (id) => request(`/orders/${id}`),
+    updateStatus: (id, body) => request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify(body) }),
+  },
+  settings: {
+    get: () => request('/settings'),
+    update: (body) => request('/admin/settings', { method: 'PUT', body: JSON.stringify(body) }),
+  },
+  admin: {
+    login: (body) => request('/admin/login', { method: 'POST', body: JSON.stringify(body), auth: false }),
+    me: () => request('/admin/me'),
+    upload: async (files) => {
+      const fd = new FormData();
+      for (const f of files) fd.append('files', f);
+      const token = getToken();
+      const res = await fetch(`${API_URL}/admin/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      return res.json();
+    },
+  },
+};

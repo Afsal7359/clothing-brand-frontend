@@ -1,0 +1,149 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+
+export default function DiscoverSwiper({ items = [] }) {
+  const scrollRef         = useRef(null);
+  const bulletsRef        = useRef(null);
+  const swiperInstanceRef = useRef(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (!items.length) return;
+    const mq = window.matchMedia('(max-width: 700px)');
+    let cleanup = () => {};
+
+    const buildSwiper = async () => {
+      if (swiperInstanceRef.current) return;
+      const container = scrollRef.current;
+      if (!container) return;
+
+      // Mark active immediately so the grid never shows on mobile
+      container.classList.add('swiper-active');
+
+      // Swiper v8+ API: pass modules in the constructor, not via Swiper.use()
+      const [{ default: Swiper }, , , { EffectCreative }] = await Promise.all([
+        import('swiper'),
+        import('swiper/css'),
+        import('swiper/css/effect-creative'),
+        import('swiper/modules'),
+      ]);
+
+      // Guard: component may have unmounted during async load
+      if (!scrollRef.current) return;
+
+      const cards = Array.from(container.querySelectorAll(':scope > .discover-card'));
+
+      const swiperEl = document.createElement('div');
+      swiperEl.className = 'swiper';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'swiper-wrapper';
+
+      cards.forEach((card) => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        slide.appendChild(card);
+        wrapper.appendChild(slide);
+      });
+      swiperEl.appendChild(wrapper);
+      container.appendChild(swiperEl);
+
+      swiperInstanceRef.current = new Swiper(swiperEl, {
+        modules: [EffectCreative],
+        effect: 'creative',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+        speed: 700,
+        loop: true,
+        creativeEffect: {
+          prev: { translate: ['-90%', 0, -300], scale: 0.82, opacity: 0.45, rotate: [0, 0, -5] },
+          next: { translate: ['90%', 0, -300], scale: 0.82, opacity: 0.45, rotate: [0, 0, 5] },
+        },
+        on: {
+          slideChange() {
+            setActiveIdx(this.realIndex);
+          },
+        },
+      });
+    };
+
+    const destroySwiper = () => {
+      const inst = swiperInstanceRef.current;
+      if (!inst) return;
+      const container = scrollRef.current;
+      const originalCards = container
+        ? Array.from(container.querySelectorAll('.discover-card'))
+        : [];
+      inst.destroy(true, true);
+      swiperInstanceRef.current = null;
+      if (container) {
+        container.classList.remove('swiper-active');
+        container.innerHTML = '';
+        originalCards.forEach((c) => container.appendChild(c));
+      }
+    };
+
+    const respond = (e) => {
+      if (e.matches) buildSwiper();
+      else destroySwiper();
+    };
+
+    respond(mq);
+    mq.addEventListener('change', respond);
+    cleanup = () => {
+      mq.removeEventListener('change', respond);
+      destroySwiper();
+    };
+
+    return cleanup;
+  }, [items]);
+
+  const goto = (i) => {
+    const inst = swiperInstanceRef.current;
+    if (inst) inst.slideToLoop(i);
+  };
+
+  if (!items.length) return null;
+
+  const active = items[activeIdx] || items[0];
+
+  return (
+    <div className="discover-wrap">
+      <div className="discover" ref={scrollRef}>
+        {items.map((c, i) => (
+          <Link href={`/collections/${c.slug}`} className="discover-card" key={c._id || i}>
+            <img className="desktop" src={c.desktopImage || `https://picsum.photos/seed/dc${i}d/1200/1500`} alt="" />
+            <img className="mobile"  src={c.mobileImage  || `https://picsum.photos/seed/dc${i}m/900/1400`}  alt="" />
+            <span className="counter">
+              {String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
+            </span>
+            <div className="discover-card-body">
+              {c.eyebrow && <span className="eyebrow">— {c.eyebrow}</span>}
+              <h3>{c.title}</h3>
+              <span className="btn">Shop now →</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="discover-swiper-ui">
+        <div className="swiper-caption">
+          <b>{active.title}</b> — {String(activeIdx + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
+        </div>
+        <div className="swiper-pagination-custom" ref={bulletsRef}>
+          {items.map((_, i) => (
+            <span
+              key={i}
+              className={`bullet ${i === activeIdx ? 'is-active' : ''}`}
+              onClick={() => goto(i)}
+              role="button"
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

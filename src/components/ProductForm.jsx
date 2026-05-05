@@ -4,6 +4,44 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, resolveImage } from '@/lib/api';
 
+const API_URL_CLIENT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
+
+async function compressImage(file, maxW = 1400) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      if (img.width <= maxW) { resolve(file); return; }
+      const scale = maxW / img.width;
+      const canvas = document.createElement('canvas');
+      canvas.width = maxW;
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })),
+        'image/jpeg', 0.85
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
+async function uploadOne(file) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : '';
+  const fd = new FormData();
+  fd.append('files', file);
+  const res = await fetch(`${API_URL_CLIENT}/admin/upload`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
+  });
+  if (!res.ok) throw new Error('Upload failed');
+  const data = await res.json();
+  return data.urls?.[0] || '';
+}
+
 const EMPTY = {
   title: '',
   description: '',
@@ -23,6 +61,7 @@ const EMPTY = {
     { size: 'XL', stock: 0 },
   ],
   collections: [],
+  relatedProducts: [],
 };
 
 const CATEGORIES = ['tshirts', 'hoodies', 'jackets', 'shirts', 'sweatshirts', 'polos', 'pants', 'shorts', 'caps', 'bags', 'other'];
@@ -31,12 +70,15 @@ export default function ProductForm({ initial = null, onSaved }) {
   const router = useRouter();
   const [form, setForm] = useState(initial ? { ...EMPTY, ...initial } : EMPTY);
   const [collections, setCollections] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [productSearch, setProductSearch] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
 
   useEffect(() => {
     api.collections.list({ active: 'false' }).then((r) => setCollections(r.items || []));
+    api.products.list({ limit: 200, status: 'active' }).then((r) => setAllProducts(r.items || []));
   }, []);
 
   const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
@@ -47,8 +89,9 @@ export default function ProductForm({ initial = null, onSaved }) {
     setUploading(true);
     setErr('');
     try {
-      const { urls } = await api.admin.upload(files);
-      setField('images', [...form.images, ...urls]);
+      const compressed = await Promise.all(files.map((f) => compressImage(f)));
+      const urls = await Promise.all(compressed.map(uploadOne));
+      setField('images', [...form.images, ...urls.filter(Boolean)]);
     } catch (error) {
       setErr(error.message || 'Upload failed');
     } finally {
@@ -82,6 +125,7 @@ export default function ProductForm({ initial = null, onSaved }) {
         variants: form.variants.filter((v) => v.size).map((v) => ({ ...v, stock: Number(v.stock) || 0 })),
         colors: Array.isArray(form.colors) ? form.colors : String(form.colors).split(',').map((s) => s.trim()).filter(Boolean),
         tags: Array.isArray(form.tags) ? form.tags : String(form.tags).split(',').map((s) => s.trim()).filter(Boolean),
+        relatedProducts: (form.relatedProducts || []).map((x) => x._id || x),
       };
       let saved;
       if (initial?._id) {
@@ -223,6 +267,45 @@ export default function ProductForm({ initial = null, onSaved }) {
                   <span>{c.title}</span>
                 </label>
               ))
+            )}
+          </div>
+
+          <div className="admin-card" style={{ marginBottom: 20 }}>
+            <h3 style={{ fontFamily: 'var(--display)', fontSize: 18, textTransform: 'uppercase', marginBottom: 14 }}>Related products</h3>
+            <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 10 }}>If none selected, same-category products are shown automatically.</p>
+            <input
+              placeholder="Search products…"
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+              style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--line)', borderRadius: 4, fontSize: 13, marginBottom: 10 }}
+            />
+            <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--line)', borderRadius: 4 }}>
+              {allProducts
+                .filter((p) => p._id !== initial?._id && (!productSearch || p.title.toLowerCase().includes(productSearch.toLowerCase())))
+                .slice(0, 30)
+                .map((p) => {
+                  const currentIds = (form.relatedProducts || []).map((x) => x._id || x);
+                  const checked = currentIds.includes(p._id);
+                  return (
+                    <label key={p._id} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '7px 10px', borderBottom: '1px solid var(--line)', fontSize: 13, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          if (e.target.checked) setField('relatedProducts', [...currentIds, p._id]);
+                          else setField('relatedProducts', currentIds.filter((id) => id !== p._id));
+                        }}
+                      />
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
+                      <span style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>₹{p.price}</span>
+                    </label>
+                  );
+                })}
+            </div>
+            {(form.relatedProducts?.length > 0) && (
+              <p style={{ fontSize: 11, marginTop: 6, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>
+                {form.relatedProducts.length} selected
+              </p>
             )}
           </div>
 

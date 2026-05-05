@@ -3,6 +3,42 @@
 import { useEffect, useState } from 'react';
 import { api, resolveImage } from '@/lib/api';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
+
+async function compressImage(file, maxW = 1400) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxW / img.width);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob((blob) => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
+async function uploadOne(file) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : null;
+  const compressed = await compressImage(file);
+  const fd = new FormData();
+  fd.append('files', compressed);
+  const res = await fetch(`${API_URL}/admin/upload`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
+  });
+  if (!res.ok) throw new Error('Upload failed');
+  const data = await res.json();
+  return data.urls?.[0] || '';
+}
+
 const EMPTY = {
   title: '',
   description: '',
@@ -55,11 +91,11 @@ export default function AdminCollectionsPage() {
   const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
 
   const handleUpload = async (e, field) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
     try {
-      const { urls } = await api.admin.upload([files[0]]);
-      setField(field, urls[0]);
+      const url = await uploadOne(file);
+      setField(field, url);
     } catch (error) {
       setErr(error.message);
     }

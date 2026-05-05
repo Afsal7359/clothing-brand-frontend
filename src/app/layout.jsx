@@ -1,5 +1,9 @@
 import { Archivo, Archivo_Black, JetBrains_Mono } from 'next/font/google';
 import { CartProvider } from '@/context/CartContext';
+import { UserProvider } from '@/context/UserContext';
+import { AnalyticsProvider } from '@/context/AnalyticsContext';
+import BottomNav from '@/components/BottomNav';
+import CartToast from '@/components/CartToast';
 import './globals.css';
 
 const archivo = Archivo({
@@ -24,7 +28,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: 'NORTHVERSE — Premium Streetwear',
+  title: 'underdwag — Premium Streetwear',
   description: 'Gender-neutral premium streetwear built in India.',
   viewport: {
     width: 'device-width',
@@ -38,7 +42,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${archivo.variable} ${archivoBlack.variable} ${mono.variable}`}>
       <body>
-        <CartProvider>{children}</CartProvider>
+        <AnalyticsProvider>
+          <UserProvider>
+            <CartProvider>
+              {children}
+              <BottomNav />
+              <CartToast />
+            </CartProvider>
+          </UserProvider>
+        </AnalyticsProvider>
       </body>
     </html>
   );

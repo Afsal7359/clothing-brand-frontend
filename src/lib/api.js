@@ -1,15 +1,22 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
+const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:5005';
 
-function getToken() {
+function getAdminToken() {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('nv_token');
 }
 
+function getUserToken() {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('nv_user_token');
+}
+
 async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-  const token = getToken();
+  const token = getAdminToken();
   if (token && options.auth !== false) headers.Authorization = `Bearer ${token}`;
+  const userToken = getUserToken();
+  if (userToken && options.userAuth) headers['x-user-token'] = `Bearer ${userToken}`;
 
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
@@ -66,10 +73,23 @@ export const api = {
     },
     get: (id) => request(`/orders/${id}`),
     updateStatus: (id, body) => request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify(body) }),
+    myOrders: () => request('/orders/my', { userAuth: true }),
+    myOrder: (id) => request(`/orders/my/${id}`, { userAuth: true }),
   },
   settings: {
     get: () => request('/settings'),
     update: (body) => request('/admin/settings', { method: 'PUT', body: JSON.stringify(body) }),
+  },
+  coupons: {
+    list: () => request('/coupons'),
+    create: (body) => request('/coupons', { method: 'POST', body: JSON.stringify(body) }),
+    update: (id, body) => request(`/coupons/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+    remove: (id) => request(`/coupons/${id}`, { method: 'DELETE' }),
+    validate: (body) => request('/coupons/validate', { method: 'POST', body: JSON.stringify(body), auth: false }),
+  },
+  auth: {
+    me: () => request('/auth/me', { auth: false, userAuth: true }),
+    updateProfile: (body) => request('/auth/me', { method: 'PUT', body: JSON.stringify(body), auth: false, userAuth: true }),
   },
   admin: {
     login: (body) => request('/admin/login', { method: 'POST', body: JSON.stringify(body), auth: false }),
@@ -77,7 +97,7 @@ export const api = {
     upload: async (files) => {
       const fd = new FormData();
       for (const f of files) fd.append('files', f);
-      const token = getToken();
+      const token = getAdminToken();
       const res = await fetch(`${API_URL}/admin/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

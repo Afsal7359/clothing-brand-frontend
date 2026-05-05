@@ -13,6 +13,8 @@ export default function AdminSidebar() {
     { href: '/admin/products', label: 'Products' },
     { href: '/admin/collections', label: 'Collections' },
     { href: '/admin/orders', label: 'Orders' },
+    { href: '/admin/coupons', label: 'Coupons' },
+    { href: '/admin/analytics', label: 'Analytics' },
     { href: '/admin/site', label: 'Site Settings' },
   ];
 
@@ -21,7 +23,7 @@ export default function AdminSidebar() {
   return (
     <nav className="admin-side">
       <Link href="/" className="logo">
-        NORTH<span>×</span>VERSE
+        underdwag
       </Link>
       {links.map((l) => (
         <Link key={l.href} href={l.href} className={isActive(l.href) ? 'active' : ''}>

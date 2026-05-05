@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="site">
       <div className="foot-top">
         <div className="foot-brand">
-          <div className="logo">NORTH<span>×</span>VERSE</div>
+          <div className="logo">underdwag</div>
           <p>Premium streetwear built in India. New drops every season. Subscribe for early access.</p>
           <form
             className="newsletter"
@@ -56,7 +56,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="foot-bottom">
-        <span>© {new Date().getFullYear()} NORTHVERSE. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} underdwag. All rights reserved.</span>
         <span>Bengaluru · Delhi · Mumbai</span>
       </div>
     </footer>

@@ -8,14 +8,9 @@ function AdminShell({ children }) {
   const pathname = usePathname();
   const { loading, admin } = useAdmin();
 
-  // Login page has no sidebar
   if (pathname === '/admin/login') return <>{children}</>;
-
-  if (loading) {
-    return <div className="loader">Loading…</div>;
-  }
-
-  if (!admin) return null; // redirect in progress
+  if (loading) return <div className="loader">Loading…</div>;
+  if (!admin) return null;
 
   return (
     <div className="admin-shell">

@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { track } from '@/lib/tracker';
 
 const CartContext = createContext(null);
 
@@ -37,6 +38,8 @@ export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(reducer, []);
   const [hydrated, setHydrated] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
 
   useEffect(() => {
     try {
@@ -55,10 +58,29 @@ export function CartProvider({ children }) {
 
   const add = (item) => {
     dispatch({ type: 'ADD', item });
-    setDrawerOpen(true);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(item.title || 'Item');
+    toastTimer.current = setTimeout(() => setToast(null), 2200);
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
+      track('cart_add', window.location.pathname, {
+        productId: item.productId,
+        title:     item.title,
+        price:     item.price,
+        size:      item.size || '',
+      });
+    }
   };
   const update = (index, quantity) => dispatch({ type: 'UPDATE_QTY', index, quantity });
-  const remove = (index) => dispatch({ type: 'REMOVE', index });
+  const remove = (index) => {
+    const removed = items[index];
+    dispatch({ type: 'REMOVE', index });
+    if (removed && typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
+      track('cart_remove', window.location.pathname, {
+        productId: removed.productId,
+        title:     removed.title,
+      });
+    }
+  };
   const clear = () => dispatch({ type: 'CLEAR' });
 
   const count = items.reduce((sum, it) => sum + it.quantity, 0);
@@ -66,7 +88,7 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ items, count, subtotal, add, update, remove, clear, drawerOpen, setDrawerOpen }}
+      value={{ items, count, subtotal, add, update, remove, clear, drawerOpen, setDrawerOpen, toast }}
     >
       {children}
     </CartContext.Provider>

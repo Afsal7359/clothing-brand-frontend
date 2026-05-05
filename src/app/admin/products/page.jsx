@@ -4,20 +4,25 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, resolveImage } from '@/lib/api';
 
+const PAGE_SIZE = 30;
+
 export default function AdminProductsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
   const [category, setCategory] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const load = async () => {
+  const load = async (pg = page) => {
     setLoading(true);
     try {
-      const params = { limit: 100, status: 'active' };
+      const params = { limit: PAGE_SIZE, page: pg };
       if (q) params.q = q;
       if (category) params.category = category;
       const res = await api.products.list(params);
       setItems(res.items || []);
+      setTotal(res.total || 0);
     } catch (err) {
       console.error(err);
     } finally {
@@ -25,9 +30,10 @@ export default function AdminProductsPage() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(1); setPage(1); }, []);
+
+  const handleSearch = () => { setPage(1); load(1); };
+  const goPage = (p) => { setPage(p); load(p); };
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this product? This cannot be undone.')) return;
@@ -43,7 +49,10 @@ export default function AdminProductsPage() {
     <>
       <div className="admin-head">
         <h1>Products</h1>
-        <Link href="/admin/products/new" className="btn btn-dark btn-sm">+ New product</Link>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link href="/admin/products/bulk" className="btn btn-sm">↑ Bulk upload</Link>
+          <Link href="/admin/products/new" className="btn btn-dark btn-sm">+ New product</Link>
+        </div>
       </div>
 
       <div className="admin-card" style={{ marginBottom: 20 }}>
@@ -60,7 +69,7 @@ export default function AdminProductsPage() {
             <option value="pants">Pants</option>
             <option value="shorts">Shorts</option>
           </select>
-          <button className="btn btn-dark btn-sm" onClick={load}>Search</button>
+          <button className="btn btn-dark btn-sm" onClick={handleSearch}>Search</button>
         </div>
       </div>
 
@@ -114,6 +123,17 @@ export default function AdminProductsPage() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {total > PAGE_SIZE && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 20, fontFamily: 'var(--mono)', fontSize: 12 }}>
+          <button className="btn" style={{ padding: '6px 14px' }} onClick={() => goPage(page - 1)} disabled={page === 1}>← Prev</button>
+          <span style={{ color: 'var(--ink-soft)' }}>
+            Page {page} of {Math.ceil(total / PAGE_SIZE)} &nbsp;·&nbsp; {total} products
+          </span>
+          <button className="btn" style={{ padding: '6px 14px' }} onClick={() => goPage(page + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)}>Next →</button>
         </div>
       )}
     </>

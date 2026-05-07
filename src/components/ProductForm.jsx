@@ -158,7 +158,7 @@ export default function ProductForm({ initial = null, onSaved }) {
             </div>
             <div className="form-row">
               <div className="field">
-                <label>Price (₹)</label>
+                <label>Price (£)</label>
                 <input type="number" min="0" value={form.price} onChange={(e) => setField('price', e.target.value)} required />
               </div>
               <div className="field">
@@ -297,7 +297,7 @@ export default function ProductForm({ initial = null, onSaved }) {
                         }}
                       />
                       <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
-                      <span style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>₹{p.price}</span>
+                      <span style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>£{p.price}</span>
                     </label>
                   );
                 })}

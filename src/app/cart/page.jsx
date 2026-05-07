@@ -49,7 +49,7 @@ function CouponInput({ subtotal, onApply }) {
   if (applied) {
     return (
       <div className="coupon-applied">
-        <span>🎉 <b>{applied.code}</b> — ₹{applied.discount} off</span>
+        <span>🎉 <b>{applied.code}</b> — £{applied.discount} off</span>
         <button onClick={remove} className="coupon-remove">×</button>
       </div>
     );
@@ -89,7 +89,7 @@ function StripeForm({ onSuccess, total, disabled }) {
       const intentRes = await fetch(`${API_URL}/stripe/create-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total, currency: 'inr' }),
+        body: JSON.stringify({ amount: total, currency: 'gbp' }),
       });
       const { clientSecret, paymentIntentId } = await intentRes.json();
 
@@ -115,7 +115,7 @@ function StripeForm({ onSuccess, total, disabled }) {
       {err && <div className="err" style={{ marginTop: 12 }}>{err}</div>}
       <button type="submit" className="btn btn-dark" disabled={loading || disabled || !stripe}
         style={{ width: '100%', justifyContent: 'center', padding: 16, marginTop: 16 }}>
-        {loading ? 'Processing…' : `Pay ₹${total?.toLocaleString('en-IN')}`}
+        {loading ? 'Processing…' : `Pay £${total?.toLocaleString('en-GB')}`}
       </button>
     </form>
   );
@@ -203,7 +203,7 @@ export default function CartPage() {
     fetch(`${API_URL}/stripe/create-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total, currency: 'inr' }),
+      body: JSON.stringify({ amount: total, currency: 'gbp' }),
     }).then((r) => r.json()).then((d) => {
       if (!cancelled) setStripeClientSecret(d.clientSecret || '');
     }).catch(() => { });
@@ -273,7 +273,7 @@ export default function CartPage() {
                     <img src={resolveImage(it.image)} alt={it.title} />
                     <div>
                       <div className="cart-item-title">{it.title}</div>
-                      <div className="cart-item-meta">{it.size ? `Size: ${it.size} · ` : ''}₹{it.price.toLocaleString('en-IN')}</div>
+                      <div className="cart-item-meta">{it.size ? `Size: ${it.size} · ` : ''}£{it.price.toLocaleString('en-GB')}</div>
                       <div className="qty">
                         <button onClick={() => update(i, it.quantity - 1)}>−</button>
                         <span>{it.quantity}</span>
@@ -281,7 +281,7 @@ export default function CartPage() {
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: 500, marginBottom: 8 }}>₹{(it.price * it.quantity).toLocaleString('en-IN')}</div>
+                      <div style={{ fontWeight: 500, marginBottom: 8 }}>£{(it.price * it.quantity).toLocaleString('en-GB')}</div>
                       <button className="cart-remove" onClick={() => remove(i)}>Remove</button>
                     </div>
                   </div>
@@ -368,7 +368,7 @@ export default function CartPage() {
                     <button onClick={handleCodSubmit} className="btn btn-dark" disabled={submitting}
                       data-track="checkout-confirm-cod"
                       style={{ width: '100%', justifyContent: 'center', padding: 16, marginTop: 12 }}>
-                      {submitting ? 'Placing order…' : `Confirm order · ₹${total.toLocaleString('en-IN')}`}
+                      {submitting ? 'Placing order…' : `Confirm order · £${total.toLocaleString('en-GB')}`}
                     </button>
                   </>
                 )}
@@ -389,17 +389,17 @@ export default function CartPage() {
             {/* Summary sidebar */}
             <aside className="admin-card cart-summary">
               <h3 style={{ fontFamily: 'var(--display)', fontSize: 20, textTransform: 'uppercase', marginBottom: 14 }}>Summary</h3>
-              <div className="summary-row"><span>Subtotal</span><span style={{ fontFamily: 'var(--mono)' }}>₹{subtotal.toLocaleString('en-IN')}</span></div>
-              <div className="summary-row"><span>Shipping</span><span style={{ fontFamily: 'var(--mono)' }}>{shippingFee === 0 ? 'Free' : `₹${shippingFee}`}</span></div>
+              <div className="summary-row"><span>Subtotal</span><span style={{ fontFamily: 'var(--mono)' }}>£{subtotal.toLocaleString('en-GB')}</span></div>
+              <div className="summary-row"><span>Shipping</span><span style={{ fontFamily: 'var(--mono)' }}>{shippingFee === 0 ? 'Free' : `£${shippingFee}`}</span></div>
               {couponDiscount > 0 && (
                 <div className="summary-row" style={{ color: '#16a34a' }}>
                   <span>Coupon ({coupon.code})</span>
-                  <span style={{ fontFamily: 'var(--mono)' }}>−₹{couponDiscount.toLocaleString('en-IN')}</span>
+                  <span style={{ fontFamily: 'var(--mono)' }}>−£{couponDiscount.toLocaleString('en-GB')}</span>
                 </div>
               )}
               <div className="summary-row summary-total">
                 <span>Total</span>
-                <span style={{ fontFamily: 'var(--mono)' }}>₹{total.toLocaleString('en-IN')}</span>
+                <span style={{ fontFamily: 'var(--mono)' }}>£{total.toLocaleString('en-GB')}</span>
               </div>
 
               <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
@@ -407,7 +407,7 @@ export default function CartPage() {
               </div>
 
               <p style={{ fontSize: 11.5, color: 'var(--ink-soft)', marginTop: 14 }}>
-                Taxes included. Free shipping on orders above ₹2,500.
+                Taxes included. Free shipping on orders above £2,500.
               </p>
             </aside>
           </div>

@@ -59,8 +59,8 @@ export default async function ProductPage({ params }) {
           <h1 className="pdp-title">{product.title}</h1>
 
           <div className="pdp-price">
-            {onSale && <span className="strike">₹{product.compareAtPrice.toLocaleString('en-IN')}</span>}
-            <span style={{ fontWeight: 600 }}>₹{product.price.toLocaleString('en-IN')}</span>
+            {onSale && <span className="strike">£{product.compareAtPrice.toLocaleString('en-GB')}</span>}
+            <span style={{ fontWeight: 600 }}>£{product.price.toLocaleString('en-GB')}</span>
             {onSale && <span className="badge red" style={{ marginLeft: 6 }}>-{pct}%</span>}
           </div>
 
@@ -110,7 +110,7 @@ export default async function ProductPage({ params }) {
 
           {/* Shipping & returns */}
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: '1px solid var(--line)', fontSize: 13, lineHeight: 2, color: 'var(--ink-soft)' }}>
-            <div>✓ Free shipping on orders above ₹2,500</div>
+            <div>✓ Free shipping on orders above £2,500</div>
             <div>✓ 7-day easy returns &amp; exchanges</div>
             <div>✓ Cash on delivery available</div>
             <div>✓ Secure payments with Stripe</div>
@@ -138,8 +138,8 @@ export default async function ProductPage({ params }) {
                   <div className="product-card-info">
                     <p className="product-card-title">{p.title}</p>
                     <div className="product-card-price">
-                      <span>₹{p.price.toLocaleString()}</span>
-                      {hasSale && <span className="product-card-compare">₹{p.compareAtPrice.toLocaleString()}</span>}
+                      <span>£{p.price.toLocaleString()}</span>
+                      {hasSale && <span className="product-card-compare">£{p.compareAtPrice.toLocaleString()}</span>}
                     </div>
                   </div>
                 </Link>

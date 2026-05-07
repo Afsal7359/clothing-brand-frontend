@@ -94,14 +94,14 @@ export default function AdminOrdersPage() {
                   <tr key={o._id}>
                     <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{o.orderNumber}</td>
                     <td style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
-                      {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(o.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td>
                       <div style={{ fontWeight: 500 }}>{o.shippingAddress?.fullName}</div>
                       <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{o.email}</div>
                     </td>
                     <td>{o.items.length}</td>
-                    <td style={{ fontFamily: 'var(--mono)' }}>₹{o.total.toLocaleString('en-IN')}</td>
+                    <td style={{ fontFamily: 'var(--mono)' }}>£{o.total.toLocaleString('en-GB')}</td>
                     <td>
                       <span style={{ fontFamily: 'var(--mono)', fontSize: 11, padding: '3px 8px', border: `1px solid ${STATUS_COLOR[o.paymentStatus] || '#888'}`, color: STATUS_COLOR[o.paymentStatus] || '#888', borderRadius: 2 }}>
                         {o.paymentStatus}
@@ -188,23 +188,23 @@ export default function AdminOrdersPage() {
                         <div style={{ fontSize: 13, fontWeight: 500 }}>{it.title}</div>
                         <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{it.size ? `Size: ${it.size} · ` : ''}Qty: {it.quantity}</div>
                       </div>
-                      <div style={{ fontSize: 13, fontFamily: 'var(--mono)' }}>₹{(it.price * it.quantity).toLocaleString('en-IN')}</div>
+                      <div style={{ fontSize: 13, fontFamily: 'var(--mono)' }}>£{(it.price * it.quantity).toLocaleString('en-GB')}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Totals */}
                 <div style={{ marginBottom: 20, fontSize: 13 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}><span>Subtotal</span><span style={{ fontFamily: 'var(--mono)' }}>₹{selected.subtotal?.toLocaleString('en-IN')}</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}><span>Shipping</span><span style={{ fontFamily: 'var(--mono)' }}>{selected.shippingFee === 0 ? 'Free' : `₹${selected.shippingFee}`}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}><span>Subtotal</span><span style={{ fontFamily: 'var(--mono)' }}>£{selected.subtotal?.toLocaleString('en-GB')}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}><span>Shipping</span><span style={{ fontFamily: 'var(--mono)' }}>{selected.shippingFee === 0 ? 'Free' : `£${selected.shippingFee}`}</span></div>
                   {selected.couponDiscount > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', color: '#16a34a' }}>
                       <span>Coupon ({selected.couponCode})</span>
-                      <span style={{ fontFamily: 'var(--mono)' }}>−₹{selected.couponDiscount?.toLocaleString('en-IN')}</span>
+                      <span style={{ fontFamily: 'var(--mono)' }}>−£{selected.couponDiscount?.toLocaleString('en-GB')}</span>
                     </div>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: 15, padding: '8px 0', borderTop: '1px solid var(--line)', marginTop: 4 }}>
-                    <span>Total</span><span style={{ fontFamily: 'var(--mono)' }}>₹{selected.total?.toLocaleString('en-IN')}</span>
+                    <span>Total</span><span style={{ fontFamily: 'var(--mono)' }}>£{selected.total?.toLocaleString('en-GB')}</span>
                   </div>
                 </div>
 
@@ -221,7 +221,7 @@ export default function AdminOrdersPage() {
                             {ev.message && <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>{ev.message}</div>}
                             {ev.location && <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>📍 {ev.location}</div>}
                             <div style={{ fontSize: 11, color: 'var(--ink-soft)', marginTop: 2, fontFamily: 'var(--mono)' }}>
-                              {new Date(ev.timestamp).toLocaleString('en-IN')}
+                              {new Date(ev.timestamp).toLocaleString('en-GB')}
                             </div>
                           </div>
                         </div>

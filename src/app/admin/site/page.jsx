@@ -13,13 +13,14 @@ const DEFAULT_HERO = {
 };
 
 const EMPTY_STORY = { label: '', image: '', href: '/collections' };
-const EMPTY_STORE = { city: '', address: '', image: '', directionsUrl: '#', phone: '', isOpen: true };
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
 export default function AdminSitePage() {
   const [tab, setTab]       = useState('hero');
   const [hero, setHero]     = useState(DEFAULT_HERO);
   const [stories, setStories] = useState([]);
-  const [stores, setStores]   = useState([]);
+  const [craft, setCraft]     = useState({ image: '', products: [] });
+  const [allProducts, setAllProducts] = useState([]);
   const [saving, setSaving]   = useState(false);
   const [uploading, setUploading] = useState({});
   const [err, setErr]   = useState('');
@@ -29,9 +30,17 @@ export default function AdminSitePage() {
     api.settings.get().then((s) => {
       if (s.hero)            setHero({ ...DEFAULT_HERO, ...s.hero });
       if (s.stories?.length) setStories(s.stories);
-      if (s.stores?.length)  setStores(s.stores);
+      if (s.craft)           setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'craft' || allProducts.length > 0) return;
+    fetch(`${API_URL}/products?limit=200&status=active`)
+      .then((r) => r.json())
+      .then((d) => setAllProducts(d.items || []))
+      .catch(() => {});
+  }, [tab]);
 
   /* ── upload helper ─────────────────────────────────────────── */
   const doUpload = async (key, fileList) => {
@@ -66,23 +75,13 @@ export default function AdminSitePage() {
     e.target.value = '';
   };
 
-  /* ── store helpers ─────────────────────────────────────────── */
-  const storeChange = (i, field, val) =>
-    setStores((arr) => arr.map((s, j) => j === i ? { ...s, [field]: val } : s));
-
-  const storeUpload = async (e, i) => {
-    const url = await doUpload(`store_${i}`, e.target.files);
-    if (url) storeChange(i, 'image', url);
-    e.target.value = '';
-  };
-
   /* ── save ──────────────────────────────────────────────────── */
   const handleSave = async () => {
     setSaving(true);
     setErr('');
     setSaved(false);
     try {
-      await api.settings.update({ hero, stories, stores });
+      await api.settings.update({ hero, stories, craft });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
@@ -126,7 +125,7 @@ export default function AdminSitePage() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
         <button style={tabBtn('hero')}    onClick={() => setTab('hero')}>Hero Banner</button>
         <button style={tabBtn('stories')} onClick={() => setTab('stories')}>Stories ({stories.length})</button>
-        <button style={tabBtn('stores')}  onClick={() => setTab('stores')}>Stores ({stores.length})</button>
+        <button style={tabBtn('craft')}   onClick={() => setTab('craft')}>Craft</button>
       </div>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -226,71 +225,78 @@ export default function AdminSitePage() {
         </div>
       )}
 
-      {/* ── STORES ───────────────────────────────────────────── */}
-      {tab === 'stores' && (
+      {/* ── CRAFT ───────────────────────────────────────────── */}
+      {tab === 'craft' && (
         <div>
-          {stores.map((s, i) => (
-            <div key={i} className="admin-card" style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                <span style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)' }}>
-                  Store {i + 1}{s.city ? ` — ${s.city}` : ''}
-                </span>
-                <button
-                  onClick={() => setStores((arr) => arr.filter((_, j) => j !== i))}
-                  style={{ fontFamily: 'var(--mono)', fontSize: 10, color: '#991b1b', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  Remove
-                </button>
-              </div>
-
-              <div className="form-row" style={{ alignItems: 'flex-start' }}>
-                {/* Image */}
-                <div className="field" style={{ maxWidth: 220 }}>
-                  <label>Store image</label>
-                  {s.image && (
-                    <img src={resolveImage(s.image)} alt="" style={{ width: '100%', borderRadius: 4, marginBottom: 8, display: 'block' }} />
-                  )}
-                  <input type="file" accept="image/*" onChange={(e) => storeUpload(e, i)} disabled={uploading[`store_${i}`]} />
-                  {uploading[`store_${i}`] && <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Uploading…</span>}
-                </div>
-
-                <div style={{ flex: 1 }}>
-                  <div className="form-row">
-                    <div className="field">
-                      <label>City</label>
-                      <input value={s.city} onChange={(e) => storeChange(i, 'city', e.target.value)} placeholder="Delhi" />
-                    </div>
-                    <div className="field" style={{ paddingTop: 24 }}>
-                      <label style={{ display: 'flex', gap: 8, alignItems: 'center', textTransform: 'none', letterSpacing: 0, fontFamily: 'inherit', fontSize: 13, color: 'var(--ink)', marginBottom: 0 }}>
-                        <input type="checkbox" checked={s.isOpen} onChange={(e) => storeChange(i, 'isOpen', e.target.checked)} />
-                        Open now
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="field">
-                    <label>Address</label>
-                    <input value={s.address} onChange={(e) => storeChange(i, 'address', e.target.value)} placeholder="Greater Kailash II, New Delhi, 110048" />
-                  </div>
-
-                  <div className="form-row">
-                    <div className="field">
-                      <label>Phone</label>
-                      <input value={s.phone} onChange={(e) => storeChange(i, 'phone', e.target.value)} placeholder="+910000000000" />
-                    </div>
-                    <div className="field">
-                      <label>Directions URL</label>
-                      <input value={s.directionsUrl} onChange={(e) => storeChange(i, 'directionsUrl', e.target.value)} placeholder="https://maps.google.com/..." />
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* Card image */}
+          <div className="admin-card" style={{ marginBottom: 16 }}>
+            <div className="field">
+              <label>Card image</label>
+              {craft.image && (
+                <img src={resolveImage(craft.image)} alt="" style={{ width: '100%', maxWidth: 320, borderRadius: 4, marginBottom: 8, display: 'block' }} />
+              )}
+              <input
+                type="file" accept="image/*"
+                onChange={async (e) => {
+                  const url = await doUpload('craft_image', e.target.files);
+                  if (url) setCraft((c) => ({ ...c, image: url }));
+                  e.target.value = '';
+                }}
+                disabled={uploading['craft_image']}
+              />
+              {uploading['craft_image'] && <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Uploading…</span>}
             </div>
-          ))}
+          </div>
 
-          <button className="btn btn-outline btn-sm" onClick={() => setStores((s) => [...s, { ...EMPTY_STORE }])}>
-            + Add store
-          </button>
+          {/* Product picker */}
+          <div className="admin-card">
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 4 }}>
+                Crafted Products
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
+                Select products to display when the Craft card is clicked. ({craft.products.length} selected)
+              </p>
+            </div>
+
+            {allProducts.length === 0 ? (
+              <p style={{ fontSize: 13, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>Loading products…</p>
+            ) : (
+              <div style={{ maxHeight: 480, overflowY: 'auto', border: '1px solid var(--line)', borderRadius: 4 }}>
+                {allProducts.map((p) => {
+                  const selected = craft.products.some((cp) => cp._id === p._id);
+                  const toggle = () => {
+                    setCraft((c) => ({
+                      ...c,
+                      products: selected
+                        ? c.products.filter((cp) => cp._id !== p._id)
+                        : [...c.products, { _id: p._id, title: p.title, price: p.price, compareAtPrice: p.compareAtPrice, images: p.images, slug: p.slug, isNew: p.isNew }],
+                    }));
+                  };
+                  return (
+                    <label
+                      key={p._id}
+                      onClick={toggle}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '10px 14px', borderBottom: '1px solid var(--line)',
+                        cursor: 'pointer', background: selected ? '#f0fdf4' : 'transparent',
+                      }}
+                    >
+                      <input type="checkbox" checked={selected} onChange={toggle} style={{ flexShrink: 0 }} />
+                      {p.images?.[0] && (
+                        <img src={resolveImage(p.images[0])} alt="" style={{ width: 40, height: 50, objectFit: 'cover', borderRadius: 2, flexShrink: 0 }} />
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 500, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</div>
+                        <div style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>£{p.price}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

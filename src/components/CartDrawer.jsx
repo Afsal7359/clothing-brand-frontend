@@ -37,7 +37,7 @@ export default function CartDrawer() {
                   <div>
                     <div className="cart-item-title">{it.title}</div>
                     <div className="cart-item-meta">
-                      {it.size ? `Size: ${it.size} · ` : ''}₹{it.price.toLocaleString('en-IN')}
+                      {it.size ? `Size: ${it.size} · ` : ''}£{it.price.toLocaleString('en-GB')}
                     </div>
                     <div className="qty">
                       <button onClick={() => update(i, it.quantity - 1)} aria-label="Decrease">−</button>
@@ -47,7 +47,7 @@ export default function CartDrawer() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontWeight: 500, marginBottom: 8 }}>
-                      ₹{(it.price * it.quantity).toLocaleString('en-IN')}
+                      £{(it.price * it.quantity).toLocaleString('en-GB')}
                     </div>
                     <button className="cart-remove" onClick={() => remove(i)}>Remove</button>
                   </div>
@@ -58,7 +58,7 @@ export default function CartDrawer() {
             <div className="cart-foot">
               <div className="cart-total">
                 <span>Subtotal</span>
-                <span className="mono">₹{subtotal.toLocaleString('en-IN')}</span>
+                <span className="mono">£{subtotal.toLocaleString('en-GB')}</span>
               </div>
               <p style={{ fontSize: 11.5, color: 'var(--ink-mute)', marginBottom: 14 }}>
                 Shipping & taxes calculated at checkout.

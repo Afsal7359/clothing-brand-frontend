@@ -105,7 +105,7 @@ export default function AdminProductsPage() {
                       <div style={{ fontSize: 11, color: 'var(--ink-mute)', fontFamily: 'var(--mono)' }}>{p.slug}</div>
                     </td>
                     <td>{p.category}</td>
-                    <td>₹{p.price.toLocaleString('en-IN')}</td>
+                    <td>£{p.price.toLocaleString('en-GB')}</td>
                     <td>
                       <span className={`badge ${stock > 0 ? 'green' : 'red'}`}>{stock}</span>
                     </td>

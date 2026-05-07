@@ -116,7 +116,7 @@ export default function AccountPage() {
                     <div className="order-card-head">
                       <div>
                         <span className="order-number">#{o.orderNumber}</span>
-                        <span className="order-date">{new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="order-date">{new Date(o.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
                       <span className="order-status-badge" style={{ background: STATUS_COLOR[o.status] || '#888' }}>
                         {o.status}
@@ -135,7 +135,7 @@ export default function AccountPage() {
                       {o.items.length > 3 && <p style={{ fontSize: 12, color: 'var(--ink-soft)' }}>+{o.items.length - 3} more</p>}
                     </div>
                     <div className="order-card-foot">
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>₹{o.total?.toLocaleString('en-IN')}</span>
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>£{o.total?.toLocaleString('en-GB')}</span>
                       {o.paymentMethod === 'cod'
                         ? <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-soft)' }}>COD</span>
                         : <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: '#16a34a' }}>Paid</span>}

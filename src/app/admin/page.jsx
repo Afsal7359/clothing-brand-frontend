@@ -65,7 +65,7 @@ export default function AdminDashboard() {
         </div>
         <div className="stat">
           <div className="label">Recent Revenue</div>
-          <div className="value" style={{ fontSize: 22 }}>₹{stats.revenue.toLocaleString('en-IN')}</div>
+          <div className="value" style={{ fontSize: 22 }}>£{stats.revenue.toLocaleString('en-GB')}</div>
         </div>
       </div>
 
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
                     <td style={{ fontFamily: 'var(--mono)' }}>{o.orderNumber}</td>
                     <td>{o.email}</td>
                     <td>{o.items.length}</td>
-                    <td>₹{o.total.toLocaleString('en-IN')}</td>
+                    <td>£{o.total.toLocaleString('en-GB')}</td>
                     <td>
                       <span className={`badge ${o.status === 'pending' ? 'amber' : o.status === 'delivered' ? 'green' : 'blue'}`}>
                         {o.status}

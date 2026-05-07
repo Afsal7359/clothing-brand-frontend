@@ -107,25 +107,25 @@ export default function CouponsPage() {
                   <label>Type *</label>
                   <select name="type" value={form.type} onChange={handleChange}>
                     <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed amount (₹)</option>
+                    <option value="fixed">Fixed amount (£)</option>
                   </select>
                 </div>
               </div>
               <div className="form-row">
                 <div className="field">
-                  <label>Value * {form.type === 'percentage' ? '(%)' : '(₹)'}</label>
+                  <label>Value * {form.type === 'percentage' ? '(%)' : '(£)'}</label>
                   <input type="number" name="value" value={form.value} onChange={handleChange} required min={0} step="0.01" />
                 </div>
                 {form.type === 'percentage' && (
                   <div className="field">
-                    <label>Max discount cap (₹)</label>
+                    <label>Max discount cap (£)</label>
                     <input type="number" name="maxDiscountAmount" value={form.maxDiscountAmount} onChange={handleChange} min={0} placeholder="Leave empty for no cap" />
                   </div>
                 )}
               </div>
               <div className="form-row">
                 <div className="field">
-                  <label>Min order amount (₹)</label>
+                  <label>Min order amount (£)</label>
                   <input type="number" name="minOrderAmount" value={form.minOrderAmount} onChange={handleChange} min={0} />
                 </div>
                 <div className="field">
@@ -189,15 +189,15 @@ export default function CouponsPage() {
                     </td>
                     <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{c.type}</td>
                     <td style={{ fontFamily: 'var(--mono)' }}>
-                      {c.type === 'percentage' ? `${c.value}%` : `₹${c.value}`}
-                      {c.maxDiscountAmount && <span style={{ fontSize: 11, color: 'var(--ink-soft)', display: 'block' }}>max ₹{c.maxDiscountAmount}</span>}
-                      {c.minOrderAmount > 0 && <span style={{ fontSize: 11, color: 'var(--ink-soft)', display: 'block' }}>min ₹{c.minOrderAmount}</span>}
+                      {c.type === 'percentage' ? `${c.value}%` : `£${c.value}`}
+                      {c.maxDiscountAmount && <span style={{ fontSize: 11, color: 'var(--ink-soft)', display: 'block' }}>max £{c.maxDiscountAmount}</span>}
+                      {c.minOrderAmount > 0 && <span style={{ fontSize: 11, color: 'var(--ink-soft)', display: 'block' }}>min £{c.minOrderAmount}</span>}
                     </td>
                     <td style={{ fontFamily: 'var(--mono)' }}>
                       {c.usedCount} / {c.maxUses ?? '∞'}
                     </td>
                     <td style={{ fontSize: 13 }}>
-                      {c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('en-IN') : '—'}
+                      {c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('en-GB') : '—'}
                     </td>
                     <td>
                       <button

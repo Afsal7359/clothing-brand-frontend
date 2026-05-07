@@ -60,8 +60,8 @@ export default function ProductCard({ product }) {
       </div>
       <div className="product-name">{product.title}</div>
       <div className="product-price">
-        {onSale && <span className="strike">₹{product.compareAtPrice.toLocaleString('en-IN')}</span>}
-        <span className="now">₹{product.price.toLocaleString('en-IN')}</span>
+        {onSale && <span className="strike">£{product.compareAtPrice.toLocaleString('en-GB')}</span>}
+        <span className="now">£{product.price.toLocaleString('en-GB')}</span>
       </div>
     </Link>
   );

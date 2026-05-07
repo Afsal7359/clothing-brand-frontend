@@ -30,8 +30,8 @@ const SAMPLE_ROW = [
 const COLUMN_HINTS = [
   'Product name (required)',
   'Full description',
-  'Selling price in ₹ (required)',
-  'Original/MRP price in ₹',
+  'Selling price in £ (required)',
+  'Original/MRP price in £',
   'Format: S:10,M:20,L:15,XL:5 (size:stock)',
   'Comma-separated colors',
   'Comma-separated tags',
@@ -234,7 +234,7 @@ function RelatedPicker({ selectedIds, onChange, excludeId }) {
               {p.images?.[0] && <img src={resolveImage(p.images[0])} alt="" />}
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{p.title}</div>
-                <div style={{ fontSize: 11, color: 'var(--ink-soft)' }}>₹{p.price}</div>
+                <div style={{ fontSize: 11, color: 'var(--ink-soft)' }}>£{p.price}</div>
               </div>
               {selectedIds.includes(p._id) && <span style={{ marginLeft: 'auto', color: '#16a34a' }}>✓</span>}
             </div>
@@ -648,11 +648,11 @@ export default function BulkUploadPage() {
               <div className="bulk-review-details">
                 <div className="bulk-review-row">
                   <div className="bulk-review-field">
-                    <label>Price ₹ *</label>
+                    <label>Price £ *</label>
                     <input type="number" value={r.price} onChange={(e) => updateRow(r.id, { price: e.target.value })} min="0" disabled={r.done} />
                   </div>
                   <div className="bulk-review-field">
-                    <label>Compare Price ₹</label>
+                    <label>Compare Price £</label>
                     <input type="number" value={r.compareAtPrice} onChange={(e) => updateRow(r.id, { compareAtPrice: e.target.value })} min="0" disabled={r.done} />
                   </div>
                   <div className="bulk-review-field">

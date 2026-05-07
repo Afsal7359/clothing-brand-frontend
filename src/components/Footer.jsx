@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="foot-top">
         <div className="foot-brand">
           <div className="logo">underdwag</div>
-          <p>Premium streetwear built in India. New drops every season. Subscribe for early access.</p>
+          <p>Premium streetwear. New drops every season. Subscribe for early access.</p>
           <form
             className="newsletter"
             onSubmit={(e) => {
@@ -57,7 +57,7 @@ export default function Footer() {
       </div>
       <div className="foot-bottom">
         <span>© {new Date().getFullYear()} underdwag. All rights reserved.</span>
-        <span>Bengaluru · Delhi · Mumbai</span>
+        <span>Manchester · London</span>
       </div>
     </footer>
   );

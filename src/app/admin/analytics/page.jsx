@@ -63,15 +63,15 @@ function fmtDuration(ms) {
 }
 
 function fmtTime(ts) {
-  return new Date(ts).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
 function fmtDate(ts) {
-  return new Date(ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(ts).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function fmtDateShort(ts) {
-  return new Date(ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  return new Date(ts).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
 
 function relTime(ts, base) {
@@ -336,8 +336,8 @@ function SessionDrawer({ sid, onClose }) {
                             {ev.data.depth     && <span><b>depth:</b> {ev.data.depth}%</span>}
                             {ev.data.itemCount && <span><b>items:</b> {ev.data.itemCount}</span>}
                             {ev.data.orderNumber && <span><b>order:</b> {ev.data.orderNumber}</span>}
-                            {ev.data.price     && <span><b>price:</b> ₹{ev.data.price?.toLocaleString('en-IN')}</span>}
-                            {ev.data.total     && <span><b>total:</b> ₹{ev.data.total?.toLocaleString('en-IN')}</span>}
+                            {ev.data.price     && <span><b>price:</b> £{ev.data.price?.toLocaleString('en-GB')}</span>}
+                            {ev.data.total     && <span><b>total:</b> £{ev.data.total?.toLocaleString('en-GB')}</span>}
                           </div>
                         )}
                       </div>
@@ -548,7 +548,7 @@ function SessionsTab() {
 function OverviewTab({ summary, timeline }) {
   const labels = timeline.map((r) => {
     const d = new Date(r.date + 'T00:00:00');
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   });
 
   const totalPV = timeline.reduce((s, r) => s + r.pageviews, 0);
@@ -669,9 +669,9 @@ function OverviewTab({ summary, timeline }) {
               <div>
                 <div style={{ fontFamily: 'var(--display)', fontSize: 15, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Traffic over time</div>
                 <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--ink-soft)', marginTop: 4, letterSpacing: '0.08em' }}>
-                  {new Date(timeline[0].date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {new Date(timeline[0].date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                   {' – '}
-                  {new Date(timeline[timeline.length - 1].date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {new Date(timeline[timeline.length - 1].date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </div>
               </div>
 

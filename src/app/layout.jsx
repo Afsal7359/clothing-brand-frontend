@@ -29,7 +29,7 @@ const mono = JetBrains_Mono({
 
 export const metadata = {
   title: 'underdwag — Premium Streetwear',
-  description: 'Gender-neutral premium streetwear built in India.',
+  description: 'Gender-neutral premium streetwear. London, UK.',
   viewport: {
     width: 'device-width',
     initialScale: 1,

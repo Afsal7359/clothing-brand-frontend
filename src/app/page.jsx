@@ -3,7 +3,6 @@ import CartDrawer from '@/components/CartDrawer';
 import Hero from '@/components/Hero';
 import ProductCard from '@/components/ProductCard';
 import DiscoverSwiper from '@/components/DiscoverSwiper';
-import Marquee from '@/components/Marquee';
 import Craft from '@/components/Stores';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -52,8 +51,8 @@ async function getData() {
 export default async function HomePage() {
   const { latest, collectionRails, allCollections, settings } = await getData();
 
-  const hero  = settings?.hero  || {};
-  const craft = settings?.craft || null;
+  const hero          = settings?.hero          || {};
+  const craft         = settings?.craft         || null;
 
   return (
     <>
@@ -116,8 +115,6 @@ export default async function HomePage() {
           <DiscoverSwiper items={allCollections} />
         </section>
       )}
-
-      <div data-section="marquee"><Marquee /></div>
 
       <div data-section="craft"><Craft craft={craft} /></div>
       <Footer />

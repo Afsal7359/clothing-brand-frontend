@@ -1,5 +1,4 @@
 import { api, resolveImage } from '@/lib/api';
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
@@ -9,11 +8,27 @@ import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
 
+const DEFAULT_SHIPPING_INFO = [
+  'Free shipping on orders above £250',
+  '7-day easy returns & exchanges',
+  'UK delivery 2–5 working days',
+  'Secure payments with Stripe',
+];
+
 async function getProduct(slug) {
   try {
     return await api.products.get(slug);
   } catch {
     return null;
+  }
+}
+
+async function getShippingInfo() {
+  try {
+    const s = await api.settings.get();
+    return s.shippingInfo?.length ? s.shippingInfo : DEFAULT_SHIPPING_INFO;
+  } catch {
+    return DEFAULT_SHIPPING_INFO;
   }
 }
 
@@ -29,7 +44,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductPage({ params }) {
   const slug = (await params).slug;
-  const product = await getProduct(slug);
+  const [product, shippingLines] = await Promise.all([getProduct(slug), getShippingInfo()]);
   if (!product) notFound();
 
   const onSale = product.compareAtPrice && product.compareAtPrice > product.price;
@@ -39,7 +54,6 @@ export default async function ProductPage({ params }) {
 
   return (
     <>
-      <AnnounceBar />
       <Header />
       <CartDrawer />
 
@@ -110,10 +124,9 @@ export default async function ProductPage({ params }) {
 
           {/* Shipping & returns */}
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: '1px solid var(--line)', fontSize: 13, lineHeight: 2, color: 'var(--ink-soft)' }}>
-            <div>✓ Free shipping on orders above £2,500</div>
-            <div>✓ 7-day easy returns &amp; exchanges</div>
-            <div>✓ Cash on delivery available</div>
-            <div>✓ Secure payments with Stripe</div>
+            {shippingLines.map((line, i) => (
+              <div key={i}>✓ {line}</div>
+            ))}
           </div>
         </aside>
       </div>

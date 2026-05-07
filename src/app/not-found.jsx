@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
@@ -7,7 +6,6 @@ import Footer from '@/components/Footer';
 export default function NotFound() {
   return (
     <>
-      <AnnounceBar />
       <Header />
       <CartDrawer />
       <section className="section" style={{ textAlign: 'center', minHeight: '50vh' }}>

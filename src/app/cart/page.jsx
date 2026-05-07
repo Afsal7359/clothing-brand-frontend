@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
@@ -129,7 +128,7 @@ export default function CartPage() {
 
   const [form, setForm] = useState({
     fullName: '', phone: '',
-    line1: '', line2: '', city: '', state: '', postalCode: '', country: 'India',
+    line1: '', line2: '', city: '', state: '', postalCode: '', country: 'United Kingdom',
     notes: '',
   });
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -154,7 +153,7 @@ export default function CartPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLoading]);
 
-  const shippingFee = subtotal >= 2500 || subtotal === 0 ? 0 : 99;
+  const shippingFee = subtotal >= 250 || subtotal === 0 ? 0 : 3.99;
   const couponDiscount = coupon?.discount || 0;
   const total = Math.max(0, subtotal + shippingFee - couponDiscount);
 
@@ -214,7 +213,6 @@ export default function CartPage() {
   if (userLoading || (!user && typeof window !== 'undefined')) {
     return (
       <>
-        <AnnounceBar /><Header />
         <div style={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="loader">Loading…</div>
         </div>
@@ -226,7 +224,6 @@ export default function CartPage() {
   if (placed) {
     return (
       <>
-        <AnnounceBar /><Header /><CartDrawer />
         <section className="section" style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 12 }}>
             Order confirmed
@@ -248,7 +245,6 @@ export default function CartPage() {
 
   return (
     <>
-      <AnnounceBar /><Header /><CartDrawer />
 
       <section className="section">
         <div className="section-head">
@@ -307,17 +303,42 @@ export default function CartPage() {
                 <h3 style={{ fontFamily: 'var(--display)', fontSize: 22, textTransform: 'uppercase', marginBottom: 18, marginTop: 24 }}>Shipping details</h3>
                 <div className="form-row">
                   <div className="field"><label>Full name</label><input name="fullName" value={form.fullName} onChange={handleChange} required /></div>
-                  <div className="field"><label>Phone</label><input name="phone" value={form.phone} onChange={handleChange} required /></div>
+                  <div className="field">
+                    <label>Phone</label>
+                    <input
+                      name="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d\s\+\-\(\)]/g, '') }))}
+                      pattern="^[\+]?[\d\s\-\(\)]{10,15}$"
+                      title="Enter a valid UK phone number (e.g. 07700 900123 or +44 7700 900123)"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="field"><label>Address line 1</label><input name="line1" value={form.line1} onChange={handleChange} required /></div>
                 <div className="field"><label>Address line 2 (optional)</label><input name="line2" value={form.line2} onChange={handleChange} /></div>
                 <div className="form-row">
                   <div className="field"><label>City</label><input name="city" value={form.city} onChange={handleChange} required /></div>
-                  <div className="field"><label>State</label><input name="state" value={form.state} onChange={handleChange} required /></div>
+                  <div className="field"><label>County</label><input name="state" value={form.state} onChange={handleChange} /></div>
                 </div>
                 <div className="form-row">
-                  <div className="field"><label>Postal code</label><input name="postalCode" value={form.postalCode} onChange={handleChange} required /></div>
-                  <div className="field"><label>Country</label><input name="country" value={form.country} onChange={handleChange} required /></div>
+                  <div className="field">
+                    <label>Postal code</label>
+                    <input
+                      name="postalCode"
+                      value={form.postalCode}
+                      onChange={(e) => setForm((f) => ({ ...f, postalCode: e.target.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '') }))}
+                      pattern="^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$"
+                      title="Enter a valid UK postcode (e.g. SW1A 1AA or M1 1AE)"
+                      placeholder="e.g. SW1A 1AA"
+                      required
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Country</label>
+                    <input name="country" value={form.country} readOnly style={{ background: 'var(--surface, #f9f9f9)', cursor: 'not-allowed', color: 'var(--ink-soft)' }} />
+                  </div>
                 </div>
 
                 {/* Payment method tiles */}
@@ -352,7 +373,7 @@ export default function CartPage() {
                     </svg>
                     <div>
                       <div className="payment-tile-title">Pay by Card</div>
-                      <div className="payment-tile-sub">Visa, Mastercard, UPI via Stripe</div>
+                      <div className="payment-tile-sub">Visa, Mastercard & more via Stripe</div>
                     </div>
                     <div className="payment-tile-radio" />
                   </button>
@@ -407,7 +428,7 @@ export default function CartPage() {
               </div>
 
               <p style={{ fontSize: 11.5, color: 'var(--ink-soft)', marginTop: 14 }}>
-                Taxes included. Free shipping on orders above £2,500.
+                Taxes included. Free shipping on orders above £250.
               </p>
             </aside>
           </div>

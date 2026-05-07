@@ -19,7 +19,8 @@ export default function AdminSitePage() {
   const [tab, setTab]       = useState('hero');
   const [hero, setHero]     = useState(DEFAULT_HERO);
   const [stories, setStories] = useState([]);
-  const [craft, setCraft]     = useState({ image: '', products: [] });
+  const [craft, setCraft]           = useState({ image: '', products: [] });
+  const [shippingInfo, setShippingInfo] = useState(['']);
   const [allProducts, setAllProducts] = useState([]);
   const [saving, setSaving]   = useState(false);
   const [uploading, setUploading] = useState({});
@@ -28,9 +29,10 @@ export default function AdminSitePage() {
 
   useEffect(() => {
     api.settings.get().then((s) => {
-      if (s.hero)            setHero({ ...DEFAULT_HERO, ...s.hero });
-      if (s.stories?.length) setStories(s.stories);
-      if (s.craft)           setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
+      if (s.hero)                  setHero({ ...DEFAULT_HERO, ...s.hero });
+      if (s.stories?.length)       setStories(s.stories);
+      if (s.craft)                 setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
+      if (s.shippingInfo?.length)  setShippingInfo(s.shippingInfo);
     }).catch(() => {});
   }, []);
 
@@ -81,7 +83,7 @@ export default function AdminSitePage() {
     setErr('');
     setSaved(false);
     try {
-      await api.settings.update({ hero, stories, craft });
+      await api.settings.update({ hero, stories, craft, shippingInfo: shippingInfo.filter(Boolean) });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
@@ -126,6 +128,7 @@ export default function AdminSitePage() {
         <button style={tabBtn('hero')}    onClick={() => setTab('hero')}>Hero Banner</button>
         <button style={tabBtn('stories')} onClick={() => setTab('stories')}>Stories ({stories.length})</button>
         <button style={tabBtn('craft')}   onClick={() => setTab('craft')}>Craft</button>
+        <button style={tabBtn('content')} onClick={() => setTab('content')}>Content</button>
       </div>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -222,6 +225,42 @@ export default function AdminSitePage() {
           <button className="btn btn-outline btn-sm" onClick={() => setStories((s) => [...s, { ...EMPTY_STORY }])}>
             + Add story
           </button>
+        </div>
+      )}
+
+      {/* ── CONTENT ─────────────────────────────────────────── */}
+      {tab === 'content' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'start' }}>
+
+          {/* Product page shipping info */}
+          <div className="admin-card" style={{ gridColumn: '1 / -1' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>
+              Product page — shipping &amp; info lines
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 16 }}>
+              Each line appears as a ✓ bullet on every product detail page.
+            </p>
+            {shippingInfo.map((line, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--ink-soft)', paddingTop: 10 }}>✓</span>
+                <input
+                  value={line}
+                  onChange={(e) => setShippingInfo((a) => a.map((v, j) => j === i ? e.target.value : v))}
+                  placeholder="Shipping info line…"
+                  style={{ flex: 1 }}
+                />
+                <button
+                  onClick={() => setShippingInfo((a) => a.filter((_, j) => j !== i))}
+                  style={{ fontFamily: 'var(--mono)', fontSize: 11, color: '#991b1b', border: '1px solid #fecaca', borderRadius: 4, padding: '0 10px', background: 'none', cursor: 'pointer' }}
+                >✕</button>
+              </div>
+            ))}
+            <button
+              className="btn btn-outline btn-sm"
+              onClick={() => setShippingInfo((a) => [...a, ''])}
+              style={{ marginTop: 4 }}
+            >+ Add line</button>
+          </div>
         </div>
       )}
 

@@ -1,4 +1,3 @@
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
@@ -33,7 +32,6 @@ export default async function CategoryPage({ params }) {
 
   return (
     <>
-      <AnnounceBar />
       <Header />
       <CartDrawer />
 

@@ -6,21 +6,24 @@ import { api, resolveImage } from '@/lib/api';
 
 const API_URL_CLIENT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
-async function compressImage(file, maxW = 1400) {
+const MAX_FILE_MB = 2;
+const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
+
+async function compressImage(file, maxW = 1200) {
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
       URL.revokeObjectURL(url);
-      if (img.width <= maxW) { resolve(file); return; }
-      const scale = maxW / img.width;
+      const w = Math.min(img.width, maxW);
+      const h = Math.round(img.height * (w / img.width));
       const canvas = document.createElement('canvas');
-      canvas.width = maxW;
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       canvas.toBlob(
         (blob) => resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })),
-        'image/jpeg', 0.85
+        'image/jpeg', 0.80
       );
     };
     img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
@@ -86,8 +89,16 @@ export default function ProductForm({ initial = null, onSaved }) {
   const handleUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    setUploading(true);
+    e.target.value = '';
     setErr('');
+
+    const oversized = files.filter((f) => f.size > MAX_FILE_BYTES);
+    if (oversized.length > 0) {
+      setErr(`File too large: ${oversized.map((f) => f.name).join(', ')} — max ${MAX_FILE_MB} MB per image.`);
+      return;
+    }
+
+    setUploading(true);
     try {
       const compressed = await Promise.all(files.map((f) => compressImage(f)));
       const urls = await Promise.all(compressed.map(uploadOne));
@@ -96,7 +107,6 @@ export default function ProductForm({ initial = null, onSaved }) {
       setErr(error.message || 'Upload failed');
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
   };
 
@@ -159,11 +169,11 @@ export default function ProductForm({ initial = null, onSaved }) {
             <div className="form-row">
               <div className="field">
                 <label>Price (£)</label>
-                <input type="number" min="0" value={form.price} onChange={(e) => setField('price', e.target.value)} required />
+                <input type="number" min="0" step="any" value={form.price} onChange={(e) => setField('price', e.target.value)} required />
               </div>
               <div className="field">
                 <label>Compare at (strike-through)</label>
-                <input type="number" min="0" value={form.compareAtPrice || ''} onChange={(e) => setField('compareAtPrice', e.target.value)} />
+                <input type="number" min="0" step="any" value={form.compareAtPrice || ''} onChange={(e) => setField('compareAtPrice', e.target.value)} />
               </div>
             </div>
           </div>
@@ -171,11 +181,14 @@ export default function ProductForm({ initial = null, onSaved }) {
           <div className="admin-card" style={{ marginBottom: 20 }}>
             <h3 style={{ fontFamily: 'var(--display)', fontSize: 18, textTransform: 'uppercase', marginBottom: 14 }}>Images</h3>
             <label className="uploader">
-              <input type="file" accept="image/*" multiple onChange={handleUpload} />
+              <input type="file" accept="image/*" multiple onChange={handleUpload} disabled={uploading} />
               <div style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
-                {uploading ? 'Uploading…' : 'Click to select images (first image = main, second = hover)'}
+                {uploading ? 'Compressing & uploading…' : 'Click to select images (first = main, second = hover)'}
               </div>
             </label>
+            <p style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)', marginTop: 6 }}>
+              Max {MAX_FILE_MB} MB per image — files are auto-compressed before upload
+            </p>
             {form.images.length > 0 && (
               <div className="image-grid">
                 {form.images.map((src, i) => (

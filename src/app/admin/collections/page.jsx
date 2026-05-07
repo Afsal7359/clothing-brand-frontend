@@ -109,11 +109,12 @@ export default function AdminCollectionsPage() {
     try {
       const payload = { ...form, order: Number(form.order) || 0 };
       if (editing?._id) {
-        await api.collections.update(editing._id, payload);
+        const updated = await api.collections.update(editing._id, payload);
+        setItems((curr) => curr.map((c) => c._id === editing._id ? updated : c));
       } else {
-        await api.collections.create(payload);
+        const created = await api.collections.create(payload);
+        setItems((curr) => [created, ...curr]);
       }
-      await load();
       cancel();
     } catch (error) {
       setErr(error.message);

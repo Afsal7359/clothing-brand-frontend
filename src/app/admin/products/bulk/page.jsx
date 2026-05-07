@@ -649,11 +649,11 @@ export default function BulkUploadPage() {
                 <div className="bulk-review-row">
                   <div className="bulk-review-field">
                     <label>Price £ *</label>
-                    <input type="number" value={r.price} onChange={(e) => updateRow(r.id, { price: e.target.value })} min="0" disabled={r.done} />
+                    <input type="number" value={r.price} onChange={(e) => updateRow(r.id, { price: e.target.value })} min="0" step="any" disabled={r.done} />
                   </div>
                   <div className="bulk-review-field">
                     <label>Compare Price £</label>
-                    <input type="number" value={r.compareAtPrice} onChange={(e) => updateRow(r.id, { compareAtPrice: e.target.value })} min="0" disabled={r.done} />
+                    <input type="number" value={r.compareAtPrice} onChange={(e) => updateRow(r.id, { compareAtPrice: e.target.value })} min="0" step="any" disabled={r.done} />
                   </div>
                   <div className="bulk-review-field">
                     <label>Status</label>

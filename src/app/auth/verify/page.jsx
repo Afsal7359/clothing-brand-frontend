@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -119,7 +118,6 @@ function VerifyForm() {
 export default function VerifyPage() {
   return (
     <>
-      <AnnounceBar />
       <Header />
       <div className="auth-page">
         <Suspense fallback={<div />}>

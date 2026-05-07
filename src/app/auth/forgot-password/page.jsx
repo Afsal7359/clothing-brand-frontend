@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -167,7 +166,6 @@ function ForgotForm() {
 export default function ForgotPasswordPage() {
   return (
     <>
-      <AnnounceBar />
       <Header />
       <div className="auth-page">
         <Suspense fallback={<div />}>

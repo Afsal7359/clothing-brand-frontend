@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
 import { resolveImage } from '@/lib/api';
-import AnnounceBar from '@/components/AnnounceBar';
 import Header from '@/components/Header';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
@@ -76,7 +75,6 @@ export default function AccountPage() {
 
   return (
     <>
-      <AnnounceBar />
       <Header />
       <CartDrawer />
 

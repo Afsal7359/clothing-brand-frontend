@@ -69,33 +69,6 @@ ul, ol { list-style: none; }
 }
 .container { width: 100%; padding-inline: var(--pad); }
 
-/* ---------- Announcement bar ---------- */
-.announce {
-  background: #0a0a0a;
-  color: #fff;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  padding-top: var(--safe-top);
-}
-.announce-track {
-  display: flex;
-  animation: marquee 28s linear infinite;
-  white-space: nowrap;
-  gap: 80px;
-  padding-left: 80px;
-}
-.announce-track span::before { content: '✦'; margin-right: 14px; color: var(--accent); }
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
 /* ---------- Header ---------- */
 header.site {
   position: sticky;
@@ -797,28 +770,6 @@ header.site {
   .swiper-caption b { color: var(--ink); font-weight: 500; }
 }
 
-/* ---------- Marquee strip ---------- */
-.strip {
-  background: #0a0a0a;
-  color: #fff;
-  overflow: hidden;
-  padding: 22px 0;
-  border-top: 1px solid #222;
-  border-bottom: 1px solid #222;
-}
-.strip-track {
-  display: flex;
-  gap: 50px;
-  white-space: nowrap;
-  animation: marquee 40s linear infinite;
-  font-family: var(--display);
-  font-size: clamp(28px, 5vw, 64px);
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-}
-.strip-track span { display: inline-flex; align-items: center; gap: 30px; }
-.strip-track span::after { content: '✦'; color: var(--accent); font-size: 0.5em; }
-
 /* ---------- Stores grid ---------- */
 .stores-grid {
   display: grid;
@@ -1405,8 +1356,6 @@ footer.site {
    ============================================================ */
 .category-bar {
   position: sticky;
-  /* header is ~56px; announce bar is ~34px but it scrolls away,
-     so just use the header height */
   top: 56px;
   z-index: 40;
   background: rgba(255, 255, 255, 0.96);

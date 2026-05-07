@@ -64,10 +64,14 @@ export default function CouponsPage() {
         startDate: form.startDate || null,
         expiryDate: form.expiryDate || null,
       };
-      if (editing) await api.coupons.update(editing, payload);
-      else await api.coupons.create(payload);
+      if (editing) {
+        const updated = await api.coupons.update(editing, payload);
+        setCoupons((curr) => curr.map((c) => c._id === editing ? updated : c));
+      } else {
+        const created = await api.coupons.create(payload);
+        setCoupons((curr) => [created, ...curr]);
+      }
       setShowForm(false);
-      await load();
     } catch (e) {
       setErr(e.message);
     } finally {
@@ -77,11 +81,13 @@ export default function CouponsPage() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this coupon?')) return;
-    try { await api.coupons.remove(id); await load(); } catch { /* ignore */ }
+    setCoupons((curr) => curr.filter((c) => c._id !== id));
+    try { await api.coupons.remove(id); } catch { setCoupons((curr) => [...curr]); load(); }
   };
 
   const handleToggle = async (c) => {
-    try { await api.coupons.update(c._id, { isActive: !c.isActive }); await load(); } catch { /* ignore */ }
+    setCoupons((curr) => curr.map((x) => x._id === c._id ? { ...x, isActive: !x.isActive } : x));
+    try { await api.coupons.update(c._id, { isActive: !c.isActive }); } catch { setCoupons((curr) => curr.map((x) => x._id === c._id ? { ...x, isActive: c.isActive } : x)); }
   };
 
   return (

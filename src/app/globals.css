@@ -414,11 +414,9 @@ header.site {
 .hero {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
   background: #0a0a0a;
 }
-.hero-img { width: 100%; height: 100%; object-fit: cover; }
+.hero-img { width: 100%; height: auto; display: block; }
 .hero-img.mobile { display: none; }
 .hero-content {
   position: absolute;
@@ -475,7 +473,6 @@ header.site {
 
 @media (max-width: 768px) {
   .hero {
-    aspect-ratio: 3 / 4;
     /* Pull hero up to sit behind the transparent sticky header */
     margin-top: -56px;
   }

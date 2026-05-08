@@ -5,22 +5,6 @@ import { useRouter } from 'next/navigation';
 import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
 
-const API_URL_CLIENT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
-
-async function uploadOne(file) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : '';
-  const fd = new FormData();
-  fd.append('files', file);
-  const res = await fetch(`${API_URL_CLIENT}/admin/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: fd,
-  });
-  if (!res.ok) throw new Error('Upload failed');
-  const data = await res.json();
-  return data.urls?.[0] || '';
-}
-
 const EMPTY = {
   title: '',
   description: '',
@@ -52,6 +36,7 @@ export default function ProductForm({ initial = null, onSaved }) {
   const [allProducts, setAllProducts] = useState([]);
   const [productSearch, setProductSearch] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
 
@@ -67,21 +52,28 @@ export default function ProductForm({ initial = null, onSaved }) {
     if (files.length === 0) return;
     e.target.value = '';
     setErr('');
-
     setUploading(true);
+    setUploadProgress(0);
     try {
-      // compressImage throws if file > 5 MB; compress + upload pipelined per file
-      const urls = await Promise.all(
-        files.map(async (f) => {
-          const compressed = await compressImage(f);
-          return uploadOne(compressed);
-        })
+      // Phase 1: compress all in parallel
+      const compressed = await Promise.all(files.map((f) => compressImage(f)));
+
+      // Phase 2: upload all in parallel, track per-file progress
+      const progresses = new Array(compressed.length).fill(0);
+      const tick = (i, pct) => {
+        progresses[i] = pct;
+        setUploadProgress(Math.round(progresses.reduce((a, b) => a + b, 0) / progresses.length));
+      };
+      const results = await Promise.all(
+        compressed.map((f, i) => api.admin.uploadWithProgress([f], (pct) => tick(i, pct)))
       );
-      setField('images', [...form.images, ...urls.filter(Boolean)]);
+      const urls = results.map((r) => r.urls?.[0]).filter(Boolean);
+      setField('images', [...form.images, ...urls]);
     } catch (error) {
       setErr(error.message || 'Upload failed');
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -158,9 +150,16 @@ export default function ProductForm({ initial = null, onSaved }) {
             <label className="uploader">
               <input type="file" accept="image/*" multiple onChange={handleUpload} disabled={uploading} />
               <div style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
-                {uploading ? 'Compressing & uploading…' : 'Click to select images (first = main, second = hover)'}
+                {uploading
+                  ? (uploadProgress === 0 ? 'Compressing…' : `Uploading ${uploadProgress}%`)
+                  : 'Click to select images (first = main, second = hover)'}
               </div>
             </label>
+            {uploading && (
+              <div className="upload-progress-wrap">
+                <div className="upload-progress-bar" style={{ width: `${uploadProgress ?? 0}%` }} />
+              </div>
+            )}
             <p style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)', marginTop: 6 }}>
               Max 5 MB per image — auto-compressed to WebP before upload
             </p>

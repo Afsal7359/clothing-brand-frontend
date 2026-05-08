@@ -16,12 +16,36 @@ const DEFAULT_HERO = {
 const EMPTY_STORY = { label: '', image: '', href: '/collections' };
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
+const DEFAULT_PAGES = {
+  contact:  { email: 'support@northverse.com', whatsappHref: '', hours: 'Mon–Sat, 10am–6pm GMT' },
+  faq:      { supportHours: 'Mon–Sat · 10am–6pm GMT · Reply within 24 hours' },
+  shipping: { standardPrice: '£3.99', standardTime: '3–5 working days', expressPrice: '£6.99', expressTime: '1–2 working days', freeThreshold: '£250', cutoffTime: '2pm GMT' },
+  returns:  { email: 'support@northverse.com', windowDays: '7', refundDays: '5–7' },
+};
+
+const DEFAULT_FOOTER = {
+  description:   'Premium streetwear. New drops every season.',
+  instagramUrl:  '',
+  whatsappUrl:   '',
+  copyrightText: '',
+  supportLinks: [
+    { label: 'Track Order',         href: '/track-order' },
+    { label: 'Returns & Exchanges', href: '/returns' },
+    { label: 'Shipping',            href: '/shipping' },
+    { label: 'FAQ',                 href: '/faq' },
+    { label: 'Contact',             href: '/contact' },
+  ],
+};
+
 export default function AdminSitePage() {
+
   const [tab, setTab]       = useState('hero');
   const [hero, setHero]     = useState(DEFAULT_HERO);
   const [stories, setStories] = useState([]);
   const [craft, setCraft]           = useState({ image: '', products: [] });
   const [shippingInfo, setShippingInfo] = useState(['']);
+  const [footer, setFooter] = useState(DEFAULT_FOOTER);
+  const [pages, setPages]   = useState(DEFAULT_PAGES);
   const [allProducts, setAllProducts] = useState([]);
   const [saving, setSaving]   = useState(false);
   const [uploading, setUploading] = useState({});
@@ -34,6 +58,8 @@ export default function AdminSitePage() {
       if (s.stories?.length)       setStories(s.stories);
       if (s.craft)                 setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
       if (s.shippingInfo?.length)  setShippingInfo(s.shippingInfo);
+      if (s.footer)                setFooter({ ...DEFAULT_FOOTER, ...s.footer, supportLinks: s.footer.supportLinks?.length ? s.footer.supportLinks : DEFAULT_FOOTER.supportLinks });
+      if (s.pages)                 setPages({ ...DEFAULT_PAGES, contact: { ...DEFAULT_PAGES.contact, ...s.pages?.contact }, faq: { ...DEFAULT_PAGES.faq, ...s.pages?.faq }, shipping: { ...DEFAULT_PAGES.shipping, ...s.pages?.shipping }, returns: { ...DEFAULT_PAGES.returns, ...s.pages?.returns } });
     }).catch(() => {});
   }, []);
 
@@ -49,10 +75,12 @@ export default function AdminSitePage() {
   const doUpload = async (key, fileList) => {
     const files = Array.from(fileList || []);
     if (!files.length) return null;
-    setUploading((u) => ({ ...u, [key]: true }));
+    setUploading((u) => ({ ...u, [key]: 0 }));
     try {
       const compressed = await compressImage(files[0]);
-      const { urls } = await api.admin.upload([compressed]);
+      const { urls } = await api.admin.uploadWithProgress([compressed], (pct) =>
+        setUploading((u) => ({ ...u, [key]: pct }))
+      );
       return urls[0];
     } catch (e) {
       setErr(e.message);
@@ -85,7 +113,7 @@ export default function AdminSitePage() {
     setErr('');
     setSaved(false);
     try {
-      await api.settings.update({ hero, stories, craft, shippingInfo: shippingInfo.filter(Boolean) });
+      await api.settings.update({ hero, stories, craft, shippingInfo: shippingInfo.filter(Boolean), footer, pages });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
@@ -131,6 +159,8 @@ export default function AdminSitePage() {
         <button style={tabBtn('stories')} onClick={() => setTab('stories')}>Stories ({stories.length})</button>
         <button style={tabBtn('craft')}   onClick={() => setTab('craft')}>Craft</button>
         <button style={tabBtn('content')} onClick={() => setTab('content')}>Content</button>
+        <button style={tabBtn('footer')}  onClick={() => setTab('footer')}>Footer</button>
+        <button style={tabBtn('pages')}   onClick={() => setTab('pages')}>Pages</button>
       </div>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -144,7 +174,7 @@ export default function AdminSitePage() {
                 <img src={resolveImage(hero.desktop)} alt="" style={{ width: '100%', maxWidth: 320, borderRadius: 4, marginBottom: 8, display: 'block' }} />
               )}
               <input type="file" accept="image/*" onChange={(e) => heroUpload(e, 'desktop')} disabled={uploading['hero_desktop']} />
-              {uploading['hero_desktop'] && <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Uploading…</span>}
+              {uploading['hero_desktop'] !== false && uploading['hero_desktop'] !== undefined && <><div className="upload-progress-wrap" style={{ marginTop: 6 }}><div className="upload-progress-bar" style={{ width: `${uploading['hero_desktop']}%` }} /></div><span style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>{uploading['hero_desktop']}%</span></>}
             </div>
             {/* Mobile image */}
             <div className="field">
@@ -153,7 +183,7 @@ export default function AdminSitePage() {
                 <img src={resolveImage(hero.mobile)} alt="" style={{ width: '100%', maxWidth: 180, borderRadius: 4, marginBottom: 8, display: 'block' }} />
               )}
               <input type="file" accept="image/*" onChange={(e) => heroUpload(e, 'mobile')} disabled={uploading['hero_mobile']} />
-              {uploading['hero_mobile'] && <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Uploading…</span>}
+              {uploading['hero_mobile'] !== false && uploading['hero_mobile'] !== undefined && <><div className="upload-progress-wrap" style={{ marginTop: 6 }}><div className="upload-progress-bar" style={{ width: `${uploading['hero_mobile']}%` }} /></div><span style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>{uploading['hero_mobile']}%</span></>}
             </div>
           </div>
 
@@ -207,7 +237,7 @@ export default function AdminSitePage() {
                     )}
                   </div>
                   <label style={{ display: 'block', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'underline' }}>
-                    {uploading[`story_${i}`] ? 'Uploading…' : 'Upload image'}
+                    {uploading[`story_${i}`] !== false && uploading[`story_${i}`] !== undefined ? `${uploading[`story_${i}`]}%` : 'Upload image'}
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => storyUpload(e, i)} disabled={uploading[`story_${i}`]} />
                   </label>
                 </div>
@@ -266,6 +296,175 @@ export default function AdminSitePage() {
         </div>
       )}
 
+      {/* ── FOOTER ──────────────────────────────────────────── */}
+      {tab === 'footer' && (
+        <div style={{ display: 'grid', gap: 16 }}>
+          <div className="admin-card">
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>
+              Brand description &amp; social links
+            </div>
+            <div className="field">
+              <label>Brand description</label>
+              <textarea
+                rows={3}
+                value={footer.description}
+                onChange={(e) => setFooter((f) => ({ ...f, description: e.target.value }))}
+                placeholder="Premium streetwear. New drops every season."
+              />
+            </div>
+            <div className="form-row">
+              <div className="field">
+                <label>Instagram URL</label>
+                <input
+                  value={footer.instagramUrl}
+                  onChange={(e) => setFooter((f) => ({ ...f, instagramUrl: e.target.value }))}
+                  placeholder="https://instagram.com/underdwag"
+                />
+              </div>
+              <div className="field">
+                <label>WhatsApp URL</label>
+                <input
+                  value={footer.whatsappUrl}
+                  onChange={(e) => setFooter((f) => ({ ...f, whatsappUrl: e.target.value }))}
+                  placeholder="https://wa.me/447XXXXXXXXX"
+                />
+              </div>
+            </div>
+            <div className="field">
+              <label>Copyright text (leave blank for auto)</label>
+              <input
+                value={footer.copyrightText}
+                onChange={(e) => setFooter((f) => ({ ...f, copyrightText: e.target.value }))}
+                placeholder={`© ${new Date().getFullYear()} underdwag. All rights reserved.`}
+              />
+            </div>
+          </div>
+
+          <div className="admin-card">
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>
+              Support links
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 16 }}>
+              These appear in the Support column of the footer.
+            </p>
+            {footer.supportLinks.map((link, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                <input
+                  value={link.label}
+                  onChange={(e) => setFooter((f) => ({ ...f, supportLinks: f.supportLinks.map((l, j) => j === i ? { ...l, label: e.target.value } : l) }))}
+                  placeholder="Label"
+                  style={{ flex: 1 }}
+                />
+                <input
+                  value={link.href}
+                  onChange={(e) => setFooter((f) => ({ ...f, supportLinks: f.supportLinks.map((l, j) => j === i ? { ...l, href: e.target.value } : l) }))}
+                  placeholder="/page-slug"
+                  style={{ flex: 1 }}
+                />
+                <button
+                  onClick={() => setFooter((f) => ({ ...f, supportLinks: f.supportLinks.filter((_, j) => j !== i) }))}
+                  style={{ fontFamily: 'var(--mono)', fontSize: 11, color: '#991b1b', border: '1px solid #fecaca', borderRadius: 4, padding: '0 10px', background: 'none', cursor: 'pointer' }}
+                >✕</button>
+              </div>
+            ))}
+            <button
+              className="btn btn-outline btn-sm"
+              onClick={() => setFooter((f) => ({ ...f, supportLinks: [...f.supportLinks, { label: '', href: '/' }] }))}
+              style={{ marginTop: 4 }}
+            >+ Add link</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── PAGES ───────────────────────────────────────────── */}
+      {tab === 'pages' && (
+        <div style={{ display: 'grid', gap: 16 }}>
+
+          {/* Contact page */}
+          <div className="admin-card">
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>Contact page</div>
+            <div className="form-row">
+              <div className="field">
+                <label>Support email</label>
+                <input value={pages.contact.email} onChange={(e) => setPages((p) => ({ ...p, contact: { ...p.contact, email: e.target.value } }))} placeholder="support@example.com" />
+              </div>
+              <div className="field">
+                <label>WhatsApp link</label>
+                <input value={pages.contact.whatsappHref} onChange={(e) => setPages((p) => ({ ...p, contact: { ...p.contact, whatsappHref: e.target.value } }))} placeholder="https://wa.me/447..." />
+              </div>
+            </div>
+            <div className="field">
+              <label>Support hours</label>
+              <input value={pages.contact.hours} onChange={(e) => setPages((p) => ({ ...p, contact: { ...p.contact, hours: e.target.value } }))} placeholder="Mon–Sat, 10am–6pm GMT" />
+            </div>
+          </div>
+
+          {/* Shipping page */}
+          <div className="admin-card">
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>Shipping page</div>
+            <div className="form-row">
+              <div className="field">
+                <label>Standard price</label>
+                <input value={pages.shipping.standardPrice} onChange={(e) => setPages((p) => ({ ...p, shipping: { ...p.shipping, standardPrice: e.target.value } }))} placeholder="£3.99" />
+              </div>
+              <div className="field">
+                <label>Standard delivery time</label>
+                <input value={pages.shipping.standardTime} onChange={(e) => setPages((p) => ({ ...p, shipping: { ...p.shipping, standardTime: e.target.value } }))} placeholder="3–5 working days" />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="field">
+                <label>Express price</label>
+                <input value={pages.shipping.expressPrice} onChange={(e) => setPages((p) => ({ ...p, shipping: { ...p.shipping, expressPrice: e.target.value } }))} placeholder="£6.99" />
+              </div>
+              <div className="field">
+                <label>Express delivery time</label>
+                <input value={pages.shipping.expressTime} onChange={(e) => setPages((p) => ({ ...p, shipping: { ...p.shipping, expressTime: e.target.value } }))} placeholder="1–2 working days" />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="field">
+                <label>Free shipping threshold</label>
+                <input value={pages.shipping.freeThreshold} onChange={(e) => setPages((p) => ({ ...p, shipping: { ...p.shipping, freeThreshold: e.target.value } }))} placeholder="£250" />
+              </div>
+              <div className="field">
+                <label>Same-day dispatch cutoff</label>
+                <input value={pages.shipping.cutoffTime} onChange={(e) => setPages((p) => ({ ...p, shipping: { ...p.shipping, cutoffTime: e.target.value } }))} placeholder="2pm GMT" />
+              </div>
+            </div>
+          </div>
+
+          {/* Returns page */}
+          <div className="admin-card">
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>Returns page</div>
+            <div className="form-row">
+              <div className="field">
+                <label>Returns email</label>
+                <input value={pages.returns.email} onChange={(e) => setPages((p) => ({ ...p, returns: { ...p.returns, email: e.target.value } }))} placeholder="support@example.com" />
+              </div>
+              <div className="field">
+                <label>Return window (days)</label>
+                <input value={pages.returns.windowDays} onChange={(e) => setPages((p) => ({ ...p, returns: { ...p.returns, windowDays: e.target.value } }))} placeholder="7" />
+              </div>
+            </div>
+            <div className="field">
+              <label>Refund processing time</label>
+              <input value={pages.returns.refundDays} onChange={(e) => setPages((p) => ({ ...p, returns: { ...p.returns, refundDays: e.target.value } }))} placeholder="5–7 business days" />
+            </div>
+          </div>
+
+          {/* FAQ page */}
+          <div className="admin-card">
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>FAQ page</div>
+            <div className="field">
+              <label>Support hours line</label>
+              <input value={pages.faq.supportHours} onChange={(e) => setPages((p) => ({ ...p, faq: { ...p.faq, supportHours: e.target.value } }))} placeholder="Mon–Sat · 10am–6pm GMT · Reply within 24 hours" />
+            </div>
+          </div>
+
+        </div>
+      )}
+
       {/* ── CRAFT ───────────────────────────────────────────── */}
       {tab === 'craft' && (
         <div>
@@ -285,7 +484,7 @@ export default function AdminSitePage() {
                 }}
                 disabled={uploading['craft_image']}
               />
-              {uploading['craft_image'] && <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Uploading…</span>}
+              {uploading['craft_image'] !== false && uploading['craft_image'] !== undefined && <><div className="upload-progress-wrap" style={{ marginTop: 6 }}><div className="upload-progress-bar" style={{ width: `${uploading['craft_image']}%` }} /></div><span style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)' }}>{uploading['craft_image']}%</span></>}
             </div>
           </div>
 

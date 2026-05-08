@@ -10,13 +10,13 @@
  *  - Fall back to JPEG 0.88 if the browser returns an empty WebP blob.
  *  - Always use imageSmoothingQuality:'high' for clean downscaling.
  */
-export async function compressImage(file, { maxPx = 1600, quality = 0.85, maxMB = 5 } = {}) {
+export async function compressImage(file, { maxPx = 1200, quality = 0.80, maxMB = 5 } = {}) {
   if (file.size > maxMB * 1024 * 1024) {
     throw new Error(`Image is larger than ${maxMB} MB. Please use a smaller file.`);
   }
 
   // Already tiny — skip re-encode to avoid any quality loss from double-compression
-  if (file.size < 150 * 1024) return file;
+  if (file.size < 200 * 1024) return file;
 
   return new Promise((resolve, reject) => {
     const img = new Image();

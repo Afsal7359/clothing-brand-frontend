@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import * as XLSX from 'xlsx';
-import { resolveImage } from '@/lib/api';
+import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
@@ -42,20 +42,11 @@ const COLUMN_HINTS = [
   'active or draft',
 ];
 
-/* ── upload helper ─────────────────────────────────────────── */
+/* ── upload helper — direct browser→Cloudinary ─────────────── */
 async function uploadImage(file) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : '';
-  const compressed = await compressImage(file); // from @/lib/imageUtils
-  const fd = new FormData();
-  fd.append('files', compressed);
-  const res = await fetch(`${API_URL}/admin/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: fd,
-  });
-  if (!res.ok) throw new Error('Upload failed');
-  const data = await res.json();
-  return data.urls?.[0] || '';
+  const compressed = await compressImage(file);
+  const { urls } = await api.admin.uploadWithProgress([compressed]);
+  return urls?.[0] || '';
 }
 
 /* ── Excel helpers ─────────────────────────────────────────── */

@@ -4,21 +4,10 @@ import { useEffect, useState } from 'react';
 import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
-
-async function uploadOne(file) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : null;
+async function uploadOne(file, onProgress) {
   const compressed = await compressImage(file);
-  const fd = new FormData();
-  fd.append('files', compressed);
-  const res = await fetch(`${API_URL}/admin/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: fd,
-  });
-  if (!res.ok) throw new Error('Upload failed');
-  const data = await res.json();
-  return data.urls?.[0] || '';
+  const { urls } = await api.admin.uploadWithProgress([compressed], onProgress);
+  return urls?.[0] || '';
 }
 
 const EMPTY = {
@@ -38,6 +27,7 @@ export default function AdminCollectionsPage() {
   const [editing, setEditing] = useState(null); // null or collection object
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
   const [err, setErr] = useState('');
 
   const load = async () => {
@@ -75,11 +65,14 @@ export default function AdminCollectionsPage() {
   const handleUpload = async (e, field) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setUploadProgress((p) => ({ ...p, [field]: 0 }));
     try {
-      const url = await uploadOne(file);
+      const url = await uploadOne(file, (pct) => setUploadProgress((p) => ({ ...p, [field]: pct })));
       setField(field, url);
     } catch (error) {
       setErr(error.message);
+    } finally {
+      setUploadProgress((p) => ({ ...p, [field]: null }));
     }
     e.target.value = '';
   };
@@ -151,7 +144,8 @@ export default function AdminCollectionsPage() {
                     <img src={resolveImage(form.desktopImage)} alt="" style={{ width: '100%', maxWidth: 240, borderRadius: 4 }} />
                   </div>
                 )}
-                <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'desktopImage')} />
+                <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'desktopImage')} disabled={uploadProgress.desktopImage != null} />
+                {uploadProgress.desktopImage != null && <><div className="upload-progress-wrap"><div className="upload-progress-bar" style={{ width: `${uploadProgress.desktopImage}%` }} /></div><span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-soft)' }}>{uploadProgress.desktopImage}%</span></>}
               </div>
               <div className="field">
                 <label>Mobile image (portrait)</label>
@@ -160,7 +154,8 @@ export default function AdminCollectionsPage() {
                     <img src={resolveImage(form.mobileImage)} alt="" style={{ width: '100%', maxWidth: 160, borderRadius: 4 }} />
                   </div>
                 )}
-                <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'mobileImage')} />
+                <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'mobileImage')} disabled={uploadProgress.mobileImage != null} />
+                {uploadProgress.mobileImage != null && <><div className="upload-progress-wrap"><div className="upload-progress-bar" style={{ width: `${uploadProgress.mobileImage}%` }} /></div><span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-soft)' }}>{uploadProgress.mobileImage}%</span></>}
               </div>
             </div>
 

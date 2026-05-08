@@ -106,5 +106,46 @@ export const api = {
       if (!res.ok) throw new Error('Upload failed');
       return res.json();
     },
+    // Direct browser→Cloudinary upload — no backend relay, real progress
+    uploadWithProgress: async (files, onProgress) => {
+      const token = getAdminToken();
+
+      // 1. Get a signed upload credential from backend (instant — pure crypto)
+      const sigRes = await fetch(`${API_URL}/admin/upload-signature`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!sigRes.ok) throw new Error('Failed to get upload credentials');
+      const { signature, timestamp, api_key, cloud_name, folder } = await sigRes.json();
+
+      // 2. Upload each file directly to Cloudinary with real XHR progress
+      const uploadOne = (file) => new Promise((resolve, reject) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('api_key', api_key);
+        fd.append('timestamp', String(timestamp));
+        fd.append('signature', signature);
+        fd.append('folder', folder);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            try { resolve(JSON.parse(xhr.responseText)); }
+            catch { reject(new Error('Invalid Cloudinary response')); }
+          } else {
+            try { reject(new Error(JSON.parse(xhr.responseText).error?.message || 'Upload failed')); }
+            catch { reject(new Error('Upload failed')); }
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(fd);
+      });
+
+      const results = await Promise.all(files.map(uploadOne));
+      return { urls: results.map((r) => r.secure_url).filter(Boolean) };
+    },
   },
 };

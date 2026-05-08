@@ -815,23 +815,22 @@ footer.site {
 .foot-social-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border: 1px solid #383838;
+  gap: 9px;
+  padding: 10px 18px;
+  border: 1px solid #3a3a3a;
   border-radius: 40px;
-  color: #d4d4d4;
+  color: #ffffff;
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  background: #1a1a1a;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  background: #1e1e1e;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
 }
-.foot-social-btn:hover { border-color: #555; color: #fff; background: #222; }
-.foot-social-btn--insta:hover { border-color: #d6249f; color: #f0a0d8; background: #1e0d1a; }
-.foot-social-btn--wa:hover    { border-color: #25D366; color: #25D366; background: #0d1e13; }
-.foot-social-btn--unset { opacity: 0.4; cursor: default; }
-.foot-social-btn--unset:hover { border-color: #383838; color: #d4d4d4; background: #1a1a1a; }
+.foot-social-btn:hover { transform: translateY(-1px); }
+.foot-social-btn--insta:hover { border-color: #d6249f; background: #220e1b; }
+.foot-social-btn--wa:hover    { border-color: #25D366; background: #0d1e13; }
 
 /* ── Upload progress bar ─────────────────────────────────── */
 .upload-progress-wrap {

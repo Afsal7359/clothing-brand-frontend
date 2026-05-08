@@ -60,25 +60,22 @@ export default function Footer() {
             <button type="submit">{joined ? 'Joined ✓' : 'Join'}</button>
           </form>
 
-          {/* Social icons — always visible, dimmed until URL is set in admin */}
           <div className="foot-socials">
-            {/* Instagram — brand gradient */}
             <a
-              href={footer.instagramUrl || '#'}
-              target={footer.instagramUrl ? '_blank' : undefined}
+              href={footer.instagramUrl || 'https://instagram.com'}
+              target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className={`foot-social-btn foot-social-btn--insta${footer.instagramUrl ? '' : ' foot-social-btn--unset'}`}
-              onClick={!footer.instagramUrl ? (e) => e.preventDefault() : undefined}
+              className="foot-social-btn foot-social-btn--insta"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <radialGradient id="ig-grad" cx="30%" cy="107%" r="150%">
-                    <stop offset="0%"   stopColor="#fdf497"/>
-                    <stop offset="5%"   stopColor="#fdf497"/>
-                    <stop offset="45%"  stopColor="#fd5949"/>
-                    <stop offset="60%"  stopColor="#d6249f"/>
-                    <stop offset="90%"  stopColor="#285AEB"/>
+                    <stop offset="0%"  stopColor="#fdf497"/>
+                    <stop offset="5%"  stopColor="#fdf497"/>
+                    <stop offset="45%" stopColor="#fd5949"/>
+                    <stop offset="60%" stopColor="#d6249f"/>
+                    <stop offset="90%" stopColor="#285AEB"/>
                   </radialGradient>
                 </defs>
                 <rect x="2" y="2" width="20" height="20" rx="5.5" fill="url(#ig-grad)"/>
@@ -88,14 +85,12 @@ export default function Footer() {
               <span>Instagram</span>
             </a>
 
-            {/* WhatsApp — brand green */}
             <a
-              href={footer.whatsappUrl || '#'}
-              target={footer.whatsappUrl ? '_blank' : undefined}
+              href={footer.whatsappUrl || 'https://wa.me'}
+              target="_blank"
               rel="noopener noreferrer"
               aria-label="WhatsApp"
-              className={`foot-social-btn foot-social-btn--wa${footer.whatsappUrl ? '' : ' foot-social-btn--unset'}`}
-              onClick={!footer.whatsappUrl ? (e) => e.preventDefault() : undefined}
+              className="foot-social-btn foot-social-btn--wa"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="11" fill="#25D366"/>

@@ -131,6 +131,8 @@ export default function CartPage() {
     line1: '', line2: '', city: '', state: '', postalCode: '', country: 'United Kingdom',
     notes: '',
   });
+  const [shippingDone, setShippingDone] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [coupon, setCoupon] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -157,7 +159,28 @@ export default function CartPage() {
   const couponDiscount = coupon?.discount || 0;
   const total = Math.max(0, subtotal + shippingFee - couponDiscount);
 
-  const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    if (fieldErrors[e.target.name]) setFieldErrors((fe) => ({ ...fe, [e.target.name]: '' }));
+  };
+
+  const validateShipping = () => {
+    const required = { fullName: 'Full name', phone: 'Phone', line1: 'Address', city: 'City', postalCode: 'Postal code' };
+    const errors = {};
+    for (const [key, label] of Object.entries(required)) {
+      if (!form[key]?.trim()) errors[key] = `${label} is required`;
+    }
+    const ukPostcode = /^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$/i;
+    if (form.postalCode && !ukPostcode.test(form.postalCode.trim())) {
+      errors.postalCode = 'Enter a valid UK postcode (e.g. SW1A 1AA)';
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const confirmShipping = () => {
+    if (validateShipping()) setShippingDone(true);
+  };
 
   const buildOrderPayload = (paymentIntentId = '') => ({
     items: items.map((it) => ({ product: it.productId, quantity: it.quantity, size: it.size })),
@@ -284,65 +307,110 @@ export default function CartPage() {
                 ))}
               </div>
 
-              {/* Shipping + Payment */}
+              {/* ── STEP 1: Shipping ── */}
+              <div className="admin-card" style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                  <h3 style={{ fontFamily: 'var(--display)', fontSize: 22, textTransform: 'uppercase', margin: 0 }}>
+                    {shippingDone ? '✓ Shipping details' : 'Shipping details'}
+                  </h3>
+                  {shippingDone && (
+                    <button
+                      type="button"
+                      onClick={() => setShippingDone(false)}
+                      style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'none', border: '1px solid var(--line)', borderRadius: 4, padding: '5px 12px', cursor: 'pointer' }}
+                    >Edit</button>
+                  )}
+                </div>
+
+                {shippingDone ? (
+                  /* Confirmed summary */
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.8 }}>
+                    <div style={{ fontWeight: 600, color: 'var(--ink)' }}>{form.fullName} · {form.phone}</div>
+                    <div>{form.line1}{form.line2 ? `, ${form.line2}` : ''}</div>
+                    <div>{form.city}{form.state ? `, ${form.state}` : ''} · {form.postalCode}</div>
+                    <div>{form.country}</div>
+                  </div>
+                ) : (
+                  /* Editable form */
+                  <>
+                    {/* Logged-in user info banner */}
+                    <div className="checkout-user-banner" style={{ marginBottom: 18 }}>
+                      {user?.avatar
+                        ? <img src={user.avatar} alt="" className="checkout-user-avatar" />
+                        : <div className="checkout-user-initial">{user?.name?.[0]?.toUpperCase() || '?'}</div>}
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{user?.name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>{user?.email}</div>
+                      </div>
+                    </div>
+
+                    <div className="form-row">
+                      <div className="field">
+                        <label>Full name *</label>
+                        <input name="fullName" value={form.fullName} onChange={handleChange} />
+                        {fieldErrors.fullName && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 3, display: 'block' }}>{fieldErrors.fullName}</span>}
+                      </div>
+                      <div className="field">
+                        <label>Phone *</label>
+                        <input
+                          name="phone" type="tel" value={form.phone}
+                          onChange={(e) => { setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d\s\+\-\(\)]/g, '') })); if (fieldErrors.phone) setFieldErrors((fe) => ({ ...fe, phone: '' })); }}
+                          placeholder="07700 900123"
+                        />
+                        {fieldErrors.phone && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 3, display: 'block' }}>{fieldErrors.phone}</span>}
+                      </div>
+                    </div>
+                    <div className="field">
+                      <label>Address line 1 *</label>
+                      <input name="line1" value={form.line1} onChange={handleChange} />
+                      {fieldErrors.line1 && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 3, display: 'block' }}>{fieldErrors.line1}</span>}
+                    </div>
+                    <div className="field">
+                      <label>Address line 2 (optional)</label>
+                      <input name="line2" value={form.line2} onChange={handleChange} />
+                    </div>
+                    <div className="form-row">
+                      <div className="field">
+                        <label>City *</label>
+                        <input name="city" value={form.city} onChange={handleChange} />
+                        {fieldErrors.city && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 3, display: 'block' }}>{fieldErrors.city}</span>}
+                      </div>
+                      <div className="field">
+                        <label>County</label>
+                        <input name="state" value={form.state} onChange={handleChange} />
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="field">
+                        <label>Postal code *</label>
+                        <input
+                          name="postalCode" value={form.postalCode} placeholder="e.g. SW1A 1AA"
+                          onChange={(e) => { setForm((f) => ({ ...f, postalCode: e.target.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '') })); if (fieldErrors.postalCode) setFieldErrors((fe) => ({ ...fe, postalCode: '' })); }}
+                        />
+                        {fieldErrors.postalCode && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 3, display: 'block' }}>{fieldErrors.postalCode}</span>}
+                      </div>
+                      <div className="field">
+                        <label>Country</label>
+                        <input value={form.country} readOnly style={{ background: 'var(--surface, #f9f9f9)', cursor: 'not-allowed', color: 'var(--ink-soft)' }} />
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-dark"
+                      onClick={confirmShipping}
+                      style={{ width: '100%', justifyContent: 'center', padding: 14, marginTop: 8 }}
+                    >
+                      Continue to payment →
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* ── STEP 2: Payment (only shown after shipping confirmed) ── */}
+              {shippingDone && (
               <div className="admin-card">
-                {/* Logged-in user info banner */}
-                <div className="checkout-user-banner">
-                  {user?.avatar
-                    ? <img src={user.avatar} alt="" className="checkout-user-avatar" />
-                    : <div className="checkout-user-initial">{user?.name?.[0]?.toUpperCase() || '?'}</div>}
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{user?.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>{user?.email}</div>
-                  </div>
-                  <div style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--ink-soft)' }}>
-                    Order confirmation will be sent here
-                  </div>
-                </div>
-
-                <h3 style={{ fontFamily: 'var(--display)', fontSize: 22, textTransform: 'uppercase', marginBottom: 18, marginTop: 24 }}>Shipping details</h3>
-                <div className="form-row">
-                  <div className="field"><label>Full name</label><input name="fullName" value={form.fullName} onChange={handleChange} required /></div>
-                  <div className="field">
-                    <label>Phone</label>
-                    <input
-                      name="phone"
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value.replace(/[^\d\s\+\-\(\)]/g, '') }))}
-                      pattern="^[\+]?[\d\s\-\(\)]{10,15}$"
-                      title="Enter a valid UK phone number (e.g. 07700 900123 or +44 7700 900123)"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="field"><label>Address line 1</label><input name="line1" value={form.line1} onChange={handleChange} required /></div>
-                <div className="field"><label>Address line 2 (optional)</label><input name="line2" value={form.line2} onChange={handleChange} /></div>
-                <div className="form-row">
-                  <div className="field"><label>City</label><input name="city" value={form.city} onChange={handleChange} required /></div>
-                  <div className="field"><label>County</label><input name="state" value={form.state} onChange={handleChange} /></div>
-                </div>
-                <div className="form-row">
-                  <div className="field">
-                    <label>Postal code</label>
-                    <input
-                      name="postalCode"
-                      value={form.postalCode}
-                      onChange={(e) => setForm((f) => ({ ...f, postalCode: e.target.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '') }))}
-                      pattern="^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$"
-                      title="Enter a valid UK postcode (e.g. SW1A 1AA or M1 1AE)"
-                      placeholder="e.g. SW1A 1AA"
-                      required
-                    />
-                  </div>
-                  <div className="field">
-                    <label>Country</label>
-                    <input name="country" value={form.country} readOnly style={{ background: 'var(--surface, #f9f9f9)', cursor: 'not-allowed', color: 'var(--ink-soft)' }} />
-                  </div>
-                </div>
-
-                {/* Payment method tiles */}
-                <h3 style={{ fontFamily: 'var(--display)', fontSize: 22, textTransform: 'uppercase', margin: '28px 0 16px' }}>Payment</h3>
+                <h3 style={{ fontFamily: 'var(--display)', fontSize: 22, textTransform: 'uppercase', marginBottom: 16 }}>Payment</h3>
                 <div className="payment-tiles">
                   <button
                     type="button"
@@ -405,6 +473,7 @@ export default function CartPage() {
                   <p style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--ink-soft)', padding: '16px 0' }}>Loading payment form…</p>
                 )}
               </div>
+              )} {/* end shippingDone */}
             </div>
 
             {/* Summary sidebar */}

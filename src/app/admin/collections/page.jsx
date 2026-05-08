@@ -2,27 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { api, resolveImage } from '@/lib/api';
+import { compressImage } from '@/lib/imageUtils';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
-
-async function compressImage(file, maxW = 1400) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const scale = Math.min(1, maxW / img.width);
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob((blob) => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.85);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
-    img.src = url;
-  });
-}
 
 async function uploadOne(file) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : null;

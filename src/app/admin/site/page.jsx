@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api, resolveImage } from '@/lib/api';
+import { compressImage } from '@/lib/imageUtils';
 
 const DEFAULT_HERO = {
   desktop: 'https://picsum.photos/seed/herodesk/1920/1080',
@@ -50,7 +51,8 @@ export default function AdminSitePage() {
     if (!files.length) return null;
     setUploading((u) => ({ ...u, [key]: true }));
     try {
-      const { urls } = await api.admin.upload([files[0]]);
+      const compressed = await compressImage(files[0]);
+      const { urls } = await api.admin.upload([compressed]);
       return urls[0];
     } catch (e) {
       setErr(e.message);

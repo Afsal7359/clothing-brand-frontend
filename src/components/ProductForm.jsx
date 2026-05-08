@@ -3,33 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, resolveImage } from '@/lib/api';
+import { compressImage } from '@/lib/imageUtils';
 
 const API_URL_CLIENT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
-
-const MAX_FILE_MB = 2;
-const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
-
-async function compressImage(file, maxW = 1200) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const w = Math.min(img.width, maxW);
-      const h = Math.round(img.height * (w / img.width));
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob(
-        (blob) => resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })),
-        'image/jpeg', 0.80
-      );
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
-    img.src = url;
-  });
-}
 
 async function uploadOne(file) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('nv_token') : '';
@@ -92,16 +68,15 @@ export default function ProductForm({ initial = null, onSaved }) {
     e.target.value = '';
     setErr('');
 
-    const oversized = files.filter((f) => f.size > MAX_FILE_BYTES);
-    if (oversized.length > 0) {
-      setErr(`File too large: ${oversized.map((f) => f.name).join(', ')} — max ${MAX_FILE_MB} MB per image.`);
-      return;
-    }
-
     setUploading(true);
     try {
-      const compressed = await Promise.all(files.map((f) => compressImage(f)));
-      const urls = await Promise.all(compressed.map(uploadOne));
+      // compressImage throws if file > 5 MB; compress + upload pipelined per file
+      const urls = await Promise.all(
+        files.map(async (f) => {
+          const compressed = await compressImage(f);
+          return uploadOne(compressed);
+        })
+      );
       setField('images', [...form.images, ...urls.filter(Boolean)]);
     } catch (error) {
       setErr(error.message || 'Upload failed');
@@ -187,7 +162,7 @@ export default function ProductForm({ initial = null, onSaved }) {
               </div>
             </label>
             <p style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)', marginTop: 6 }}>
-              Max {MAX_FILE_MB} MB per image — files are auto-compressed before upload
+              Max 5 MB per image — auto-compressed to WebP before upload
             </p>
             {form.images.length > 0 && (
               <div className="image-grid">

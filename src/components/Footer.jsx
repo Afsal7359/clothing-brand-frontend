@@ -24,7 +24,7 @@ export default function Footer() {
   const [footer, setFooter] = useState(DEFAULT_FOOTER);
 
   useEffect(() => {
-    fetch(`${API_URL}/settings`)
+    fetch(`${API_URL}/settings`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((s) => {
         if (s.footer) {

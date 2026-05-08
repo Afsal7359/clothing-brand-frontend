@@ -44,7 +44,7 @@ export default function ShippingPage() {
   const [s, setS] = useState(DEFAULTS);
 
   useEffect(() => {
-    fetch(`${API_URL}/settings`)
+    fetch(`${API_URL}/settings`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => { if (d.pages?.shipping) setS({ ...DEFAULTS, ...d.pages.shipping }); })
       .catch(() => {});

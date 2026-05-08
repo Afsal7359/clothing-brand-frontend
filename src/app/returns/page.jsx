@@ -12,7 +12,7 @@ export default function ReturnsPage() {
   const [s, setS] = useState({ email: 'support@northverse.com', windowDays: '7', refundDays: '5–7' });
 
   useEffect(() => {
-    fetch(`${API_URL}/settings`)
+    fetch(`${API_URL}/settings`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => { if (d.pages?.returns) setS((prev) => ({ ...prev, ...d.pages.returns })); })
       .catch(() => {});

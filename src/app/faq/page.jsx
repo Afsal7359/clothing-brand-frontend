@@ -168,7 +168,7 @@ export default function FaqPage() {
   const [supportHours, setSupportHours] = useState('Mon–Sat · 10am–6pm GMT · Reply within 24 hours');
 
   useEffect(() => {
-    fetch(`${API_URL}/settings`)
+    fetch(`${API_URL}/settings`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => { if (d.pages?.faq?.supportHours) setSupportHours(d.pages.faq.supportHours); })
       .catch(() => {});

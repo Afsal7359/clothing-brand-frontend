@@ -40,7 +40,7 @@ export default function ContactPage() {
   const [contactSettings, setContactSettings] = useState({ email: 'support@northverse.com', whatsappHref: '', hours: 'Mon–Sat, 10am–6pm GMT' });
 
   useEffect(() => {
-    fetch(`${API_URL}/settings`)
+    fetch(`${API_URL}/settings`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => { if (d.pages?.contact) setContactSettings((c) => ({ ...c, ...d.pages.contact })); })
       .catch(() => {});

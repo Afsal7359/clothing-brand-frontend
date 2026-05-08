@@ -28,7 +28,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: 'underdwag — Premium Streetwear',
+  title: 'underdawg — Premium Streetwear',
   description: 'Gender-neutral premium streetwear. London, UK.',
   viewport: {
     width: 'device-width',

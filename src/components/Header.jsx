@@ -9,7 +9,7 @@ function Logo() {
   const [gifLoaded, setGifLoaded] = useState(false);
 
   return (
-    <Link href="/" className="logo" aria-label="underdwag home">
+    <Link href="/" className="logo" aria-label="underdawg home">
       {/* Hidden img — only shows if gif exists and loads */}
       <img
         src="/logo.gif"
@@ -21,7 +21,7 @@ function Logo() {
       />
       {/* Text always visible unless gif loaded */}
       {!gifLoaded && (
-        <span className="logo-text">underdwag</span>
+        <span className="logo-text">underdawg</span>
       )}
     </Link>
   );

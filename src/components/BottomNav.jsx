@@ -20,14 +20,14 @@ function MobileSidebar({ open, onClose, user, logout, collections }) {
           <Link href="/" className="logo" onClick={onClose}>
             <img
               src="/logo.gif"
-              alt="underdwag"
+              alt="underdawg"
               className="logo-gif"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling.style.display = 'inline';
               }}
             />
-            <span className="logo-text">underdwag</span>
+            <span className="logo-text">underdawg</span>
           </Link>
           <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
@@ -92,7 +92,7 @@ export default function BottomNav() {
     fetch(`${API_URL}/collections`)
       .then((r) => r.json())
       .then((d) => setCollections(d.items || []))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const isHome = pathname === '/';
@@ -111,8 +111,8 @@ export default function BottomNav() {
         {/* Home */}
         <Link href="/" className={`bn-btn ${isHome ? 'bn-active' : ''}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 12L12 4l9 8" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3 12L12 4l9 8" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
 
@@ -120,8 +120,8 @@ export default function BottomNav() {
         <button className="bn-btn" onClick={() => setDrawerOpen(true)} data-track="bottomnav-cart">
           <span className="bn-cart-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 7h12l-1.4 11.2a2 2 0 01-2 1.8H9.4a2 2 0 01-2-1.8L6 7z" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M9 7a3 3 0 116 0" strokeLinecap="round"/>
+              <path d="M6 7h12l-1.4 11.2a2 2 0 01-2 1.8H9.4a2 2 0 01-2-1.8L6 7z" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M9 7a3 3 0 116 0" strokeLinecap="round" />
             </svg>
             {count > 0 && <span className="bn-badge">{count}</span>}
           </span>
@@ -130,9 +130,9 @@ export default function BottomNav() {
         {/* Menu */}
         <button className="bn-btn" onClick={() => setSidebarOpen(true)} data-track="bottomnav-menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="4" y1="7"  x2="20" y2="7"  strokeLinecap="round"/>
-            <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round"/>
-            <line x1="4" y1="17" x2="20" y2="17" strokeLinecap="round"/>
+            <line x1="4" y1="7" x2="20" y2="7" strokeLinecap="round" />
+            <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
+            <line x1="4" y1="17" x2="20" y2="17" strokeLinecap="round" />
           </svg>
         </button>
       </nav>

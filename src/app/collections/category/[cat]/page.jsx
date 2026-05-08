@@ -22,7 +22,7 @@ async function getCategoryProducts(cat) {
 
 export async function generateMetadata({ params }) {
   const cat = (await params).cat;
-  return { title: `${cat.charAt(0).toUpperCase() + cat.slice(1)} — underdwag` };
+  return { title: `${cat.charAt(0).toUpperCase() + cat.slice(1)} — underdawg` };
 }
 
 export default async function CategoryPage({ params }) {

@@ -35,9 +35,9 @@ async function getShippingInfo() {
 export async function generateMetadata({ params }) {
   const slug = (await params).slug;
   const product = await getProduct(slug);
-  if (!product) return { title: 'Product not found — underdwag' };
+  if (!product) return { title: 'Product not found — underdawg' };
   return {
-    title: `${product.title} — underdwag`,
+    title: `${product.title} — underdawg`,
     description: product.description?.slice(0, 160) || product.title,
   };
 }

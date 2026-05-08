@@ -6,10 +6,10 @@ import { compressImage } from '@/lib/imageUtils';
 
 const DEFAULT_HERO = {
   desktop: 'https://picsum.photos/seed/herodesk/1920/1080',
-  mobile:  'https://picsum.photos/seed/heromob/900/1200',
+  mobile: 'https://picsum.photos/seed/heromob/900/1200',
   eyebrow: 'SS26 — Drop 01',
-  title:   'Built For The Street',
-  ctaLabel:'Shop the collection',
+  title: 'Built For The Street',
+  ctaLabel: 'Shop the collection',
   ctaHref: '/collections',
 };
 
@@ -17,50 +17,50 @@ const EMPTY_STORY = { label: '', image: '', href: '/collections' };
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
 const DEFAULT_PAGES = {
-  contact:  { email: 'support@northverse.com', whatsappHref: '', hours: 'Mon–Sat, 10am–6pm GMT' },
-  faq:      { supportHours: 'Mon–Sat · 10am–6pm GMT · Reply within 24 hours' },
+  contact: { email: 'support@northverse.com', whatsappHref: '', hours: 'Mon–Sat, 10am–6pm GMT' },
+  faq: { supportHours: 'Mon–Sat · 10am–6pm GMT · Reply within 24 hours' },
   shipping: { standardPrice: '£3.99', standardTime: '3–5 working days', expressPrice: '£6.99', expressTime: '1–2 working days', freeThreshold: '£250', cutoffTime: '2pm GMT' },
-  returns:  { email: 'support@northverse.com', windowDays: '7', refundDays: '5–7' },
+  returns: { email: 'support@northverse.com', windowDays: '7', refundDays: '5–7' },
 };
 
 const DEFAULT_FOOTER = {
-  description:   'Premium streetwear. New drops every season.',
-  instagramUrl:  '',
-  whatsappUrl:   '',
+  description: 'Premium streetwear. New drops every season.',
+  instagramUrl: '',
+  whatsappUrl: '',
   copyrightText: '',
   supportLinks: [
-    { label: 'Track Order',         href: '/track-order' },
+    { label: 'Track Order', href: '/track-order' },
     { label: 'Returns & Exchanges', href: '/returns' },
-    { label: 'Shipping',            href: '/shipping' },
-    { label: 'FAQ',                 href: '/faq' },
-    { label: 'Contact',             href: '/contact' },
+    { label: 'Shipping', href: '/shipping' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Contact', href: '/contact' },
   ],
 };
 
 export default function AdminSitePage() {
 
-  const [tab, setTab]       = useState('hero');
-  const [hero, setHero]     = useState(DEFAULT_HERO);
+  const [tab, setTab] = useState('hero');
+  const [hero, setHero] = useState(DEFAULT_HERO);
   const [stories, setStories] = useState([]);
-  const [craft, setCraft]           = useState({ image: '', products: [] });
+  const [craft, setCraft] = useState({ image: '', products: [] });
   const [shippingInfo, setShippingInfo] = useState(['']);
   const [footer, setFooter] = useState(DEFAULT_FOOTER);
-  const [pages, setPages]   = useState(DEFAULT_PAGES);
+  const [pages, setPages] = useState(DEFAULT_PAGES);
   const [allProducts, setAllProducts] = useState([]);
-  const [saving, setSaving]   = useState(false);
+  const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState({});
-  const [err, setErr]   = useState('');
+  const [err, setErr] = useState('');
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     api.settings.get().then((s) => {
-      if (s.hero)                  setHero({ ...DEFAULT_HERO, ...s.hero });
-      if (s.stories?.length)       setStories(s.stories);
-      if (s.craft)                 setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
-      if (s.shippingInfo?.length)  setShippingInfo(s.shippingInfo);
-      if (s.footer)                setFooter({ ...DEFAULT_FOOTER, ...s.footer, supportLinks: s.footer.supportLinks?.length ? s.footer.supportLinks : DEFAULT_FOOTER.supportLinks });
-      if (s.pages)                 setPages({ ...DEFAULT_PAGES, contact: { ...DEFAULT_PAGES.contact, ...s.pages?.contact }, faq: { ...DEFAULT_PAGES.faq, ...s.pages?.faq }, shipping: { ...DEFAULT_PAGES.shipping, ...s.pages?.shipping }, returns: { ...DEFAULT_PAGES.returns, ...s.pages?.returns } });
-    }).catch(() => {});
+      if (s.hero) setHero({ ...DEFAULT_HERO, ...s.hero });
+      if (s.stories?.length) setStories(s.stories);
+      if (s.craft) setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
+      if (s.shippingInfo?.length) setShippingInfo(s.shippingInfo);
+      if (s.footer) setFooter({ ...DEFAULT_FOOTER, ...s.footer, supportLinks: s.footer.supportLinks?.length ? s.footer.supportLinks : DEFAULT_FOOTER.supportLinks });
+      if (s.pages) setPages({ ...DEFAULT_PAGES, contact: { ...DEFAULT_PAGES.contact, ...s.pages?.contact }, faq: { ...DEFAULT_PAGES.faq, ...s.pages?.faq }, shipping: { ...DEFAULT_PAGES.shipping, ...s.pages?.shipping }, returns: { ...DEFAULT_PAGES.returns, ...s.pages?.returns } });
+    }).catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function AdminSitePage() {
     fetch(`${API_URL}/products?limit=200&status=active`)
       .then((r) => r.json())
       .then((d) => setAllProducts(d.items || []))
-      .catch(() => {});
+      .catch(() => { });
   }, [tab]);
 
   /* ── upload helper ─────────────────────────────────────────── */
@@ -146,7 +146,7 @@ export default function AdminSitePage() {
         </button>
       </div>
 
-      {err   && <div className="err" style={{ marginBottom: 16 }}>{err}</div>}
+      {err && <div className="err" style={{ marginBottom: 16 }}>{err}</div>}
       {saved && (
         <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 4, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#166534' }}>
           Saved successfully.
@@ -155,12 +155,12 @@ export default function AdminSitePage() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-        <button style={tabBtn('hero')}    onClick={() => setTab('hero')}>Hero Banner</button>
+        <button style={tabBtn('hero')} onClick={() => setTab('hero')}>Hero Banner</button>
         <button style={tabBtn('stories')} onClick={() => setTab('stories')}>Stories ({stories.length})</button>
-        <button style={tabBtn('craft')}   onClick={() => setTab('craft')}>Craft</button>
+        <button style={tabBtn('craft')} onClick={() => setTab('craft')}>Craft</button>
         <button style={tabBtn('content')} onClick={() => setTab('content')}>Content</button>
-        <button style={tabBtn('footer')}  onClick={() => setTab('footer')}>Footer</button>
-        <button style={tabBtn('pages')}   onClick={() => setTab('pages')}>Pages</button>
+        <button style={tabBtn('footer')} onClick={() => setTab('footer')}>Footer</button>
+        <button style={tabBtn('pages')} onClick={() => setTab('pages')}>Pages</button>
       </div>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -318,7 +318,7 @@ export default function AdminSitePage() {
                 <input
                   value={footer.instagramUrl}
                   onChange={(e) => setFooter((f) => ({ ...f, instagramUrl: e.target.value }))}
-                  placeholder="https://instagram.com/underdwag"
+                  placeholder="https://instagram.com/underdawg"
                 />
               </div>
               <div className="field">
@@ -335,7 +335,7 @@ export default function AdminSitePage() {
               <input
                 value={footer.copyrightText}
                 onChange={(e) => setFooter((f) => ({ ...f, copyrightText: e.target.value }))}
-                placeholder={`© ${new Date().getFullYear()} underdwag. All rights reserved.`}
+                placeholder={`© ${new Date().getFullYear()} underdawg. All rights reserved.`}
               />
             </div>
           </div>

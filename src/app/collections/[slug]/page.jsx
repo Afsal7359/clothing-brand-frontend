@@ -38,12 +38,12 @@ async function getPageData(slug) {
 
 export async function generateMetadata({ params }) {
   const slug = (await params).slug;
-  if (slug === 'all') return { title: 'All Products — underdwag' };
+  if (slug === 'all') return { title: 'All Products — underdawg' };
   try {
     const data = await api.collections.get(slug);
-    return { title: `${data.collection.title} — underdwag` };
+    return { title: `${data.collection.title} — underdawg` };
   } catch {
-    return { title: 'Collection — underdwag' };
+    return { title: 'Collection — underdawg' };
   }
 }
 

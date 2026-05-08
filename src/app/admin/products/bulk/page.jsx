@@ -84,7 +84,7 @@ function downloadTemplate(collections = []) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'underdwag-bulk-template.xlsx';
+  a.download = 'underdawg-bulk-template.xlsx';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -168,7 +168,7 @@ function RelatedPicker({ selectedIds, onChange, excludeId }) {
         const res = await fetch(`${API_URL}/products?q=${encodeURIComponent(q)}&limit=10&status=active`);
         const data = await res.json();
         setResults((data.items || []).filter((p) => p._id !== excludeId));
-      } catch {}
+      } catch { }
     }, 300);
   }, [excludeId]);
 
@@ -351,7 +351,7 @@ export default function BulkUploadPage() {
         items.forEach((c) => { map[c.slug] = c._id; });
         setCollectionSlugToId(map);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleExcelFile = async (file) => {

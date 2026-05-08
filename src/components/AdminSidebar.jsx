@@ -23,7 +23,7 @@ export default function AdminSidebar() {
   return (
     <nav className="admin-side">
       <Link href="/" className="logo">
-        underdwag
+        underdawg
       </Link>
       {links.map((l) => (
         <Link key={l.href} href={l.href} className={isActive(l.href) ? 'active' : ''}>

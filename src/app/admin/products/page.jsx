@@ -10,7 +10,6 @@ export default function AdminProductsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
-  const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
@@ -19,7 +18,6 @@ export default function AdminProductsPage() {
     try {
       const params = { limit: PAGE_SIZE, page: pg };
       if (q) params.q = q;
-      if (category) params.category = category;
       const res = await api.products.list(params);
       setItems(res.items || []);
       setTotal(res.total || 0);
@@ -56,19 +54,8 @@ export default function AdminProductsPage() {
       </div>
 
       <div className="admin-card" style={{ marginBottom: 20 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px auto', gap: 10 }}>
-          <input placeholder="Search by title…" value={q} onChange={(e) => setQ(e.target.value)} style={{ padding: 10, border: '1px solid var(--line)', borderRadius: 4 }} />
-          <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ padding: 10, border: '1px solid var(--line)', borderRadius: 4 }}>
-            <option value="">All categories</option>
-            <option value="tshirts">T-shirts</option>
-            <option value="hoodies">Hoodies</option>
-            <option value="jackets">Jackets</option>
-            <option value="shirts">Shirts</option>
-            <option value="polos">Polos</option>
-            <option value="caps">Caps</option>
-            <option value="pants">Pants</option>
-            <option value="shorts">Shorts</option>
-          </select>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
+          <input placeholder="Search by title…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} style={{ padding: 10, border: '1px solid var(--line)', borderRadius: 4 }} />
           <button className="btn btn-dark btn-sm" onClick={handleSearch}>Search</button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { UserProvider } from '@/context/UserContext';
 import { AnalyticsProvider } from '@/context/AnalyticsContext';
 import BottomNav from '@/components/BottomNav';
 import CartToast from '@/components/CartToast';
+import LoadingScreen from '@/components/LoadingScreen';
 import './globals.css';
 
 const archivo = Archivo({
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
         <AnalyticsProvider>
           <UserProvider>
             <CartProvider>
+              <LoadingScreen />
               {children}
               <BottomNav />
               <CartToast />

@@ -18,16 +18,7 @@ function MobileSidebar({ open, onClose, user, logout, collections }) {
 
         <div className="sidebar-head">
           <Link href="/" className="logo" onClick={onClose}>
-            <img
-              src="/logo.gif"
-              alt="underdawg"
-              className="logo-gif"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling.style.display = 'inline';
-              }}
-            />
-            <span className="logo-text">underdawg</span>
+            <img src="/logo.png" alt="underdawg" className="logo-img" />
           </Link>
           <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
         </div>

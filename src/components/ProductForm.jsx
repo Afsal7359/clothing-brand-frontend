@@ -27,8 +27,6 @@ const EMPTY = {
   relatedProducts: [],
 };
 
-const CATEGORIES = ['tshirts', 'hoodies', 'jackets', 'shirts', 'sweatshirts', 'polos', 'pants', 'shorts', 'caps', 'bags', 'other'];
-
 export default function ProductForm({ initial = null, onSaved }) {
   const router = useRouter();
   const [form, setForm] = useState(initial ? { ...EMPTY, ...initial } : EMPTY);
@@ -217,12 +215,6 @@ export default function ProductForm({ initial = null, onSaved }) {
                 <option value="active">Active</option>
                 <option value="draft">Draft</option>
                 <option value="archived">Archived</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>Category</label>
-              <select value={form.category} onChange={(e) => setField('category', e.target.value)}>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <label style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>

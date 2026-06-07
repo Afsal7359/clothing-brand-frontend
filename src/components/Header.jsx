@@ -1,28 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useUser } from '@/context/UserContext';
 
 function Logo() {
-  const [gifLoaded, setGifLoaded] = useState(false);
-
   return (
     <Link href="/" className="logo" aria-label="underdawg home">
-      {/* Hidden img — only shows if gif exists and loads */}
-      <img
-        src="/logo.gif"
-        alt=""
-        aria-hidden="true"
-        className="logo-gif"
-        style={{ display: gifLoaded ? 'block' : 'none' }}
-        onLoad={() => setGifLoaded(true)}
-      />
-      {/* Text always visible unless gif loaded */}
-      {!gifLoaded && (
-        <span className="logo-text">underdawg</span>
-      )}
+      <img src="/logo.png" alt="underdawg" className="logo-img" />
     </Link>
   );
 }
@@ -39,9 +24,7 @@ export default function Header() {
         {/* Desktop-only nav left */}
         <div className="nav-left">
           <Link href="/collections" className="nav-item">new in</Link>
-          <Link href="/collections" className="nav-item">collections</Link>
-          <Link href="/collections/category/tshirts" className="nav-item">tops</Link>
-          <Link href="/collections/category/caps" className="nav-item">caps</Link>
+          <Link href="/collections/all" className="nav-item">collections</Link>
         </div>
 
         {/* Desktop-only nav right */}

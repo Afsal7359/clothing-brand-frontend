@@ -3,6 +3,51 @@
    Mobile-first, refined typography, safe-area aware.
    ============================================================ */
 
+/* ---------- Loading splash screen ---------- */
+.splash {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+.splash.splash-out { opacity: 0; pointer-events: none; }
+.splash-inner { display: flex; flex-direction: column; align-items: center; }
+.splash-logo {
+  width: min(360px, 78vw);
+  opacity: 0;
+  animation: splashZoom 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s forwards;
+  filter: drop-shadow(0 0 48px rgba(200,200,255,0.18));
+}
+@keyframes splashZoom {
+  from { opacity: 0; transform: scale(0.78); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.splash-bar {
+  width: min(260px, 55vw);
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 1px;
+  margin-top: 36px;
+  overflow: hidden;
+}
+.splash-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #fff 0%, #aaa 100%);
+  border-radius: 1px;
+  animation: splashBar 2.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
+}
+@keyframes splashBar {
+  0%   { width: 0%; }
+  60%  { width: 75%; }
+  100% { width: 100%; }
+}
+
 *,
 *::before,
 *::after {
@@ -129,7 +174,7 @@ header.site {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 0 var(--pad);
-  min-height: 56px;
+  min-height: 72px;
   gap: 8px;
 }
 
@@ -169,7 +214,7 @@ header.site {
   opacity: 0.55;
 }
 
-/* Logo */
+/* Logo — dark glass pill on all breakpoints */
 .logo {
   display: inline-flex;
   align-items: center;
@@ -177,46 +222,32 @@ header.site {
   color: inherit;
   line-height: 1;
   white-space: nowrap;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 8px 20px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.logo-gif {
-  height: 34px;
+.logo:hover {
+  transform: scale(1.03);
+  box-shadow:
+    0 6px 28px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.logo-img {
+  height: 52px;
   width: auto;
   display: block;
-}
-
-.logo-text {
-  font-family: var(--display);
-  font-size: clamp(15px, 2vw, 20px);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.logo-text span {
-  color: var(--accent);
-}
-
-/* ── Mobile: glass pill behind logo ── */
-@media (max-width: 900px) {
-  .nav .logo {
-    /* glass pill */
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(18px) saturate(180%);
-    -webkit-backdrop-filter: blur(18px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    border-radius: 999px;
-    padding: 8px 16px;
-    box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    /* Ensure text is readable over any background */
-    color: #0a0a0a;
-  }
-
-  .logo-text {
-    font-size: 14px;
-    letter-spacing: 0.06em;
-  }
+  object-fit: contain;
+  /* dissolve the black circular background in the PNG */
+  mix-blend-mode: screen;
 }
 
 .icon-btn {
@@ -259,14 +290,18 @@ header.site {
   }
 
   .nav {
-    grid-template-columns: auto 1fr;
-    padding: 12px var(--pad);
+    grid-template-columns: 1fr auto 1fr;
+    padding: 10px var(--pad);
     gap: 0;
   }
 
   .nav .logo {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
+  }
+
+  .logo-img {
+    height: 64px;
   }
 
   .nav-left {
@@ -626,25 +661,26 @@ header.site {
   border: 1px solid currentColor;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .hero {
-    /* Pull hero up to sit behind the transparent sticky header */
-    margin-top: -56px;
+    /* Pull hero up behind the transparent sticky header */
+    margin-top: -92px;
   }
 
+  .hero-content {
+    padding: 22px 20px 28px;
+    padding-top: calc(92px + 22px);
+    padding-bottom: calc(28px + var(--safe-bottom));
+  }
+}
+
+@media (max-width: 768px) {
   .hero-img.desktop {
     display: none;
   }
 
   .hero-img.mobile {
     display: block;
-  }
-
-  .hero-content {
-    padding: 22px 20px 28px;
-    padding-top: calc(56px + 22px);
-    /* push text content below header area */
-    padding-bottom: calc(28px + var(--safe-bottom));
   }
 }
 

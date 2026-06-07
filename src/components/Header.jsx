@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useUser } from '@/context/UserContext';
@@ -15,9 +16,17 @@ function Logo() {
 export default function Header() {
   const { count, setDrawerOpen } = useCart();
   const { user } = useUser();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header className="site">
+    <header className={`site${scrolled ? ' header-scrolled' : ''}`}>
       <nav className="nav">
         <Logo />
 

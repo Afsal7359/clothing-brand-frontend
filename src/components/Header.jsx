@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useUser } from '@/context/UserContext';
+import logoSrc from '../../public/logo.png';
 
 function Logo() {
   return (
     <Link href="/" className="logo" aria-label="underdawg home">
-      <img src="/logo.png" alt="underdawg" className="logo-img" />
+      <img src={logoSrc.src} alt="underdawg" className="logo-img" />
     </Link>
   );
 }

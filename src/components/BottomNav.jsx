@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useUser } from '@/context/UserContext';
 import { resolveImage } from '@/lib/api';
+import logoSrc from '../../public/logo.png';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
@@ -18,7 +19,7 @@ function MobileSidebar({ open, onClose, user, logout, collections }) {
 
         <div className="sidebar-head">
           <Link href="/" className="logo" onClick={onClose}>
-            <img src="/logo.png" alt="underdawg" className="logo-img" />
+            <img src={logoSrc.src} alt="underdawg" className="logo-img" />
           </Link>
           <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
         </div>

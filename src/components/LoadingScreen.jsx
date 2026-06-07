@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import logoSrc from '../../public/logo.png';
 
 export default function LoadingScreen() {
   const [phase, setPhase] = useState('in');
@@ -16,7 +15,7 @@ export default function LoadingScreen() {
   return (
     <div className={`splash splash-${phase}`} aria-hidden="true">
       <div className="splash-inner">
-        <img src={logoSrc.src} alt="" className="splash-logo" />
+        <img src="/logo.png" alt="" className="splash-logo" />
         <div className="splash-bar"><div className="splash-fill" /></div>
       </div>
     </div>

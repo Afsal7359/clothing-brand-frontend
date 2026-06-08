@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { resolveImage } from '@/lib/api';
 
 export default function ProductCard({ product }) {
   const { add } = useCart();
+  const router = useRouter();
   const [added, setAdded] = useState(false);
 
   const main = product.images?.[0] || '';
@@ -21,8 +23,8 @@ export default function ProductCard({ product }) {
     e.stopPropagation();
     if (soldOut) return;
     if (hasVariants) {
-      // Has sizes — go to detail page so user can pick
-      window.location.href = `/product/${product.slug}`;
+      // Has sizes — go to detail page so user can pick (client-side, no reload)
+      router.push(`/product/${product.slug}`);
       return;
     }
     add({
@@ -50,6 +52,7 @@ export default function ProductCard({ product }) {
         {/* Quick-add button */}
         {!soldOut && (
           <button
+            type="button"
             className={`product-qadd ${added ? 'added' : ''}`}
             onClick={handleAdd}
             aria-label={hasVariants ? 'Select options' : 'Add to bag'}

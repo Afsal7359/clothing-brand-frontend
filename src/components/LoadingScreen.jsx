@@ -15,7 +15,7 @@ export default function LoadingScreen() {
   return (
     <div className={`splash splash-${phase}`} aria-hidden="true">
       <div className="splash-inner">
-        <img src="/logo.png" alt="" className="splash-logo" />
+        <img src="/logo.png" alt="" className="splash-logo" fetchPriority="high" decoding="async" />
         <div className="splash-bar"><div className="splash-fill" /></div>
       </div>
     </div>

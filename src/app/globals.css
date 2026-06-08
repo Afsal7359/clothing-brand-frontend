@@ -209,7 +209,7 @@ header.site {
   opacity: 0.55;
 }
 
-/* Logo — solid black pill matching the logo's own background exactly */
+/* Logo — transparent PNG, text/letters only (no background pill) */
 .logo {
   display: inline-flex;
   align-items: center;
@@ -217,10 +217,7 @@ header.site {
   color: #fff;
   line-height: 1;
   white-space: nowrap;
-  background: #0a0a0a;
-  border-radius: 999px;
-  padding: 6px 18px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  padding: 4px 0;
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -230,10 +227,12 @@ header.site {
 }
 
 .logo-img {
-  height: 52px;
+  height: 44px;
   width: auto;
   display: block;
   object-fit: contain;
+  /* subtle shadow keeps the chrome legible on light backgrounds */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
 .icon-btn {
@@ -777,26 +776,22 @@ header.site {
   opacity: 0;
 }
 
-.product:hover .product-media.has-alt img.main {
-  opacity: 0;
-}
-
-.product:hover .product-media.has-alt img.alt {
-  opacity: 1;
-  transform: scale(1.04);
-}
-
-@media (hover: none) {
-  .product .product-media.has-alt img.alt {
+/* Image swap is a desktop-only hover affordance. On touch devices we never
+   swap — a single tap goes straight to the product detail page. */
+@media (hover: hover) and (pointer: fine) {
+  .product:hover .product-media.has-alt img.main {
     opacity: 0;
   }
 
-  .product.touched .product-media.has-alt img.main {
-    opacity: 0;
-  }
-
-  .product.touched .product-media.has-alt img.alt {
+  .product:hover .product-media.has-alt img.alt {
     opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .product .product-media.has-alt img.alt {
+    display: none;
   }
 }
 
@@ -835,15 +830,11 @@ header.site {
   color: #fff;
 }
 
-/* Always visible on mobile */
-@media (hover: none) {
+/* Desktop-only affordance. On touch, a single tap anywhere on the card opens
+   the detail page — no overlay button intercepting the tap. */
+@media (hover: none), (pointer: coarse) {
   .product-qadd {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-    font-size: 9px;
-    padding: 6px 14px;
-    bottom: 8px;
+    display: none;
   }
 }
 

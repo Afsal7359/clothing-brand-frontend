@@ -37,6 +37,7 @@ export default function ProductActions({ product }) {
           <div className="size-list">
             {variants.map((v) => (
               <button
+                type="button"
                 key={v._id || v.size}
                 className={`size-chip ${size === v.size ? 'active' : ''}`}
                 onClick={() => setSize(v.size)}
@@ -51,7 +52,7 @@ export default function ProductActions({ product }) {
       )}
 
       <div className="pdp-cta">
-        <button className="btn btn-dark" onClick={handleAdd}>
+        <button type="button" className="btn btn-dark" onClick={handleAdd}>
           Add to bag
         </button>
       </div>

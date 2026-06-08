@@ -74,7 +74,10 @@ body {
   background: #fff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* `clip` prevents horizontal scroll WITHOUT making <body> a scroll
+     container — `overflow-x: hidden` here breaks position: sticky (the
+     sticky header would not pin on scroll on mobile). */
+  overflow-x: clip;
   min-height: 100vh;
   min-height: 100dvh;
 }

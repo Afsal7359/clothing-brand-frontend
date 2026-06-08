@@ -289,13 +289,23 @@ header.site {
     gap: 0;
   }
 
+  /* Logo pinned to the very top at all times + frosted glass pill */
   .nav .logo {
     grid-column: 2;
     grid-row: 1;
+    background: rgba(18, 18, 18, 0.34);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    padding: 6px 16px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
   }
 
   .logo-img {
-    height: 64px;
+    height: 52px;
+    /* drop the desktop shadow — the glass pill already lifts it off the page */
+    filter: none;
   }
 
   .nav-left {

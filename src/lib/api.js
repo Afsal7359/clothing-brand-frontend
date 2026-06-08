@@ -18,11 +18,17 @@ async function request(path, options = {}) {
   const userToken = getUserToken();
   if (userToken && options.userAuth) headers['x-user-token'] = `Bearer ${userToken}`;
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-    cache: options.cache || 'no-store',
-  });
+  // Public reads pass `next: { revalidate }` to opt into Next's data cache
+  // (fast, served from cache on the server). Everything else stays no-store
+  // so admin/auth/cart data is always fresh. The two can't be combined.
+  const init = { ...options, headers };
+  if (options.next) {
+    delete init.cache;
+  } else {
+    init.cache = options.cache || 'no-store';
+  }
+
+  const res = await fetch(`${API_URL}${path}`, init);
 
   if (!res.ok) {
     let msg = `Request failed: ${res.status}`;
@@ -43,14 +49,17 @@ export function resolveImage(src) {
   return src;
 }
 
+// Cached read: 60s server-side data cache for public storefront content.
+const READ = { next: { revalidate: 60 } };
+
 // Public
 export const api = {
   products: {
     list: (params = {}) => {
       const qs = new URLSearchParams(params).toString();
-      return request(`/products${qs ? `?${qs}` : ''}`);
+      return request(`/products${qs ? `?${qs}` : ''}`, READ);
     },
-    get: (slug) => request(`/products/${slug}`),
+    get: (slug) => request(`/products/${slug}`, READ),
     create: (body) => request('/products', { method: 'POST', body: JSON.stringify(body) }),
     update: (id, body) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
     remove: (id) => request(`/products/${id}`, { method: 'DELETE' }),
@@ -58,9 +67,9 @@ export const api = {
   collections: {
     list: (params = {}) => {
       const qs = new URLSearchParams(params).toString();
-      return request(`/collections${qs ? `?${qs}` : ''}`);
+      return request(`/collections${qs ? `?${qs}` : ''}`, READ);
     },
-    get: (slug) => request(`/collections/${slug}`),
+    get: (slug) => request(`/collections/${slug}`, READ),
     create: (body) => request('/collections', { method: 'POST', body: JSON.stringify(body) }),
     update: (id, body) => request(`/collections/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
     remove: (id) => request(`/collections/${id}`, { method: 'DELETE' }),
@@ -77,7 +86,7 @@ export const api = {
     myOrder: (id) => request(`/orders/my/${id}`, { userAuth: true }),
   },
   settings: {
-    get: () => request('/settings'),
+    get: () => request('/settings', READ),
     update: (body) => request('/admin/settings', { method: 'PUT', body: JSON.stringify(body) }),
   },
   coupons: {

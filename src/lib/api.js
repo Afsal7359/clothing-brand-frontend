@@ -41,12 +41,22 @@ async function request(path, options = {}) {
   return res.json();
 }
 
-// Resolves relative upload paths to full URLs
-export function resolveImage(src) {
+// Resolves relative upload paths to full URLs and optimizes Cloudinary delivery.
+// `width` (optional) caps the delivered size for thumbnails/grids — big payload win.
+export function resolveImage(src, width) {
   if (!src) return '';
-  if (src.startsWith('http')) return src;
-  if (src.startsWith('/uploads/')) return `${UPLOADS_URL}${src}`;
-  return src;
+  let url = src;
+  if (!/^https?:\/\//.test(src)) {
+    if (src.startsWith('/uploads/')) url = `${UPLOADS_URL}${src}`;
+    else return src;
+  }
+  // Cloudinary: inject auto format + auto quality (and width cap when given).
+  // f_auto serves WebP/AVIF; q_auto right-sizes quality. Skip if already set.
+  if (url.includes('res.cloudinary.com/') && url.includes('/upload/') && !url.includes('/upload/f_auto')) {
+    const t = width ? `f_auto,q_auto,w_${width},c_limit` : 'f_auto,q_auto';
+    url = url.replace('/upload/', `/upload/${t}/`);
+  }
+  return url;
 }
 
 // Cached read: 60s server-side data cache for public storefront content.

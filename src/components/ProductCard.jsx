@@ -46,8 +46,8 @@ export default function ProductCard({ product }) {
         {!soldOut && onSale && <span className="product-tag sale">Sale</span>}
         {!soldOut && !onSale && product.isNew && <span className="product-tag">New</span>}
 
-        <img className="main" src={resolveImage(main)} alt={product.title} loading="lazy" />
-        {hasAlt && <img className="alt" src={resolveImage(alt)} alt="" loading="lazy" />}
+        <img className="main" src={resolveImage(main, 600)} alt={product.title} loading="lazy" decoding="async" />
+        {hasAlt && <img className="alt" src={resolveImage(alt, 600)} alt="" loading="lazy" decoding="async" />}
 
         {/* Quick-add button */}
         {!soldOut && (

@@ -61,7 +61,7 @@ export default async function ProductPage({ params }) {
         {/* Gallery */}
         <div className="pdp-gallery">
           {(product.images || []).slice(0, 8).map((src, i) => (
-            <img key={i} src={resolveImage(src)} alt={`${product.title} view ${i + 1}`} loading={i < 2 ? 'eager' : 'lazy'} />
+            <img key={i} src={resolveImage(src, 1080)} alt={`${product.title} view ${i + 1}`} loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />
           ))}
         </div>
 
@@ -140,7 +140,7 @@ export default async function ProductPage({ params }) {
           <h2 className="section-title" style={{ marginBottom: 32 }}>Related</h2>
           <div className="products-grid">
             {related.slice(0, 8).map((p) => {
-              const img = resolveImage(p.images?.[0]);
+              const img = resolveImage(p.images?.[0], 600);
               const hasSale = p.compareAtPrice && p.compareAtPrice > p.price;
               return (
                 <Link key={p._id} href={`/product/${p.slug}`} className="product-card">

@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { resolveImage } from '@/lib/api';
 
 export default function DiscoverSwiper({ items = [] }) {
-  const router            = useRouter();
   const scrollRef         = useRef(null);
   const bulletsRef        = useRef(null);
   const swiperInstanceRef = useRef(null);
@@ -59,6 +58,10 @@ export default function DiscoverSwiper({ items = [] }) {
         slidesPerView: 'auto',
         speed: 680,
         loop: true,
+        // A small finger wobble during a tap must NOT count as a swipe — with
+        // the default threshold:0 Swiper suppresses the click and links never
+        // navigate. 10px lets taps through while real drags still swipe.
+        threshold: 10,
         // Stacked-pages effect: prev cards go back in Z (no H overflow),
         // next cards slide in from the right. Works with body overflow-x:hidden.
         creativeEffect: {
@@ -73,13 +76,6 @@ export default function DiscoverSwiper({ items = [] }) {
         on: {
           slideChange() {
             setActiveIdx(this.realIndex);
-          },
-          // Swiper swallows native <a> taps on touch — navigate explicitly.
-          // Works for cloned (loop) slides too since we read the href off the DOM.
-          click(swiper) {
-            const slide = swiper.clickedSlide;
-            const href = slide?.querySelector('a.discover-card')?.getAttribute('href');
-            if (href) router.push(href);
           },
         },
       });
@@ -133,10 +129,9 @@ export default function DiscoverSwiper({ items = [] }) {
             href={`/collections/${c.slug}`}
             className="discover-card"
             key={c._id || i}
-            onClick={(e) => { if (swiperInstanceRef.current) e.preventDefault(); }}
           >
-            <img className="desktop" src={c.desktopImage || `https://picsum.photos/seed/dc${i}d/1200/1500`} alt="" />
-            <img className="mobile"  src={c.mobileImage  || `https://picsum.photos/seed/dc${i}m/900/1400`}  alt="" />
+            <img className="desktop" src={resolveImage(c.desktopImage, 1200) || `https://picsum.photos/seed/dc${i}d/1200/1500`} alt="" loading="lazy" decoding="async" />
+            <img className="mobile"  src={resolveImage(c.mobileImage, 900)   || `https://picsum.photos/seed/dc${i}m/900/1400`}  alt="" loading="lazy" decoding="async" />
             <span className="counter">
               {String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
             </span>

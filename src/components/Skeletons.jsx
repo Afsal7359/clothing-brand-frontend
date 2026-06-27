@@ -21,6 +21,27 @@ export function ProductGridSkeleton({ count = 8 }) {
   );
 }
 
+export function GenericSkeleton() {
+  return (
+    <>
+      <Header />
+      <div className="section" style={{ minHeight: '60vh' }}>
+        <div className="skeleton sk-line" style={{ width: '30%', height: 14 }} />
+        <div className="skeleton sk-line" style={{ width: '55%', height: 30, marginTop: 14, marginBottom: 26 }} />
+        <div className="product-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div className="sk-product" key={i}>
+              <div className="skeleton sk-media" />
+              <div className="skeleton sk-line" />
+              <div className="skeleton sk-line short" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function ProductDetailSkeleton() {
   return (
     <>

@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { resolveImage } from '@/lib/api';
 
 export default function DiscoverSwiper({ items = [] }) {
+  const router            = useRouter();
   const scrollRef         = useRef(null);
   const bulletsRef        = useRef(null);
   const swiperInstanceRef = useRef(null);
@@ -77,6 +79,12 @@ export default function DiscoverSwiper({ items = [] }) {
           slideChange() {
             setActiveIdx(this.realIndex);
           },
+          // Tap = open the centered card. Navigate by the live active index so it
+          // never matters which stacked/cloned slide physically caught the click.
+          click() {
+            const item = items[this.realIndex];
+            if (item) router.push(`/collections/${item.slug}`);
+          },
         },
       });
     };
@@ -129,6 +137,11 @@ export default function DiscoverSwiper({ items = [] }) {
             href={`/collections/${c.slug}`}
             className="discover-card"
             key={c._id || i}
+            onClick={(e) => {
+              // On mobile the Swiper `click` handler navigates by active index;
+              // block the native link so a stacked/clone card can't hijack it.
+              if (swiperInstanceRef.current) e.preventDefault();
+            }}
           >
             <img className="desktop" src={resolveImage(c.desktopImage, 1200) || `https://picsum.photos/seed/dc${i}d/1200/1500`} alt="" loading="lazy" decoding="async" />
             <img className="mobile"  src={resolveImage(c.mobileImage, 900)   || `https://picsum.photos/seed/dc${i}m/900/1400`}  alt="" loading="lazy" decoding="async" />

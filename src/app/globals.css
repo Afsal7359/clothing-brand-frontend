@@ -1085,6 +1085,16 @@ header.site {
     box-shadow: 0 12px 36px -10px rgba(0, 0, 0, 0.35);
   }
 
+  /* Only the centered card is tappable — the creative effect stacks the other
+     slides on top of it, which was stealing the click (esp. the first card).
+     pointer-events:none lets touch pass through to Swiper so swiping still works. */
+  .discover.swiper-active .swiper-slide {
+    pointer-events: none;
+  }
+  .discover.swiper-active .swiper-slide-active {
+    pointer-events: auto;
+  }
+
   .discover.swiper-active .discover-card {
     width: 100%;
     height: 100%;

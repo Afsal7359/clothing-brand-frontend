@@ -724,7 +724,7 @@ function TrafficTab({ sources }) {
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)' }}>
           <h3 style={{ fontFamily: 'var(--display)', fontSize: 16, textTransform: 'uppercase' }}>Breakdown</h3>
         </div>
-        <table className="admin-table">
+        <div className="admin-table-wrap"><table className="admin-table">
           <thead><tr><th>Source</th><th>Sessions</th><th>Share</th></tr></thead>
           <tbody>
             {sources.map((r) => (
@@ -735,7 +735,7 @@ function TrafficTab({ sources }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
   );
@@ -753,7 +753,7 @@ function BehaviorTab({ pages, sections, clicks }) {
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)' }}>
           <h3 style={{ fontFamily: 'var(--display)', fontSize: 16, textTransform: 'uppercase' }}>Top pages</h3>
         </div>
-        <table className="admin-table">
+        <div className="admin-table-wrap"><table className="admin-table">
           <thead><tr><th>Page</th><th>Views</th><th>Sessions</th><th>Share</th></tr></thead>
           <tbody>
             {pages.slice(0, 15).map((r) => (
@@ -765,7 +765,7 @@ function BehaviorTab({ pages, sections, clicks }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div className="admin-card">
@@ -776,7 +776,7 @@ function BehaviorTab({ pages, sections, clicks }) {
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)' }}>
             <h3 style={{ fontFamily: 'var(--display)', fontSize: 16, textTransform: 'uppercase' }}>Top CTA clicks</h3>
           </div>
-          <table className="admin-table">
+          <div className="admin-table-wrap"><table className="admin-table">
             <thead><tr><th>Button / CTA</th><th>Clicks</th></tr></thead>
             <tbody>
               {clicks.length === 0
@@ -784,7 +784,7 @@ function BehaviorTab({ pages, sections, clicks }) {
                 : clicks.map((r) => <tr key={r.label}><td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{r.label}</td><td style={{ fontFamily: 'var(--mono)' }}>{r.clicks}</td></tr>)
               }
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </>
@@ -814,14 +814,14 @@ function DevicesTab({ devices }) {
         <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--line)' }}>
           <h3 style={{ fontFamily: 'var(--display)', fontSize: 14, textTransform: 'uppercase' }}>Screen resolutions</h3>
         </div>
-        <table className="admin-table">
+        <div className="admin-table-wrap"><table className="admin-table">
           <thead><tr><th>Resolution</th><th>Count</th></tr></thead>
           <tbody>
             {(devices.screens || []).map((r) => (
               <tr key={r._id}><td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{r._id}</td><td style={{ fontFamily: 'var(--mono)' }}>{r.count}</td></tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
     </>
   );
@@ -838,7 +838,7 @@ function LocationTab({ locations }) {
           <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--line)' }}>
             <h3 style={{ fontFamily: 'var(--display)', fontSize: 16, textTransform: 'uppercase' }}>{title}</h3>
           </div>
-          <table className="admin-table">
+          <div className="admin-table-wrap"><table className="admin-table">
             <thead><tr><th>{title.slice(0, -1)}</th><th>Visitors</th></tr></thead>
             <tbody>
               {rows.length === 0
@@ -846,7 +846,7 @@ function LocationTab({ locations }) {
                 : rows.map((r) => <tr key={r[key]}><td>{r[key]}</td><td style={{ fontFamily: 'var(--mono)' }}>{r.visitors}</td></tr>)
               }
             </tbody>
-          </table>
+          </table></div>
         </div>
       ))}
     </div>

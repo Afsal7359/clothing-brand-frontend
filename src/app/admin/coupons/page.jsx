@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import Pagination from '@/components/Pagination';
 
 const EMPTY = {
   code: '', description: '', type: 'percentage', value: '',
@@ -11,6 +12,9 @@ const EMPTY = {
 
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
+  const paged = coupons.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY);
   const [editing, setEditing] = useState(null); // coupon id or null
@@ -172,7 +176,7 @@ export default function CouponsPage() {
           <p style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--ink-soft)' }}>Loading…</p>
         ) : (
           <div className="admin-card" style={{ padding: 0 }}>
-            <table className="admin-table">
+            <div className="admin-table-wrap"><table className="admin-table">
               <thead>
                 <tr>
                   <th>Code</th>
@@ -188,7 +192,7 @@ export default function CouponsPage() {
                 {coupons.length === 0 && (
                   <tr><td colSpan={7} style={{ textAlign: 'center', padding: 32, color: 'var(--ink-soft)' }}>No coupons yet</td></tr>
                 )}
-                {coupons.map((c) => (
+                {paged.map((c) => (
                   <tr key={c._id}>
                     <td><b style={{ fontFamily: 'var(--mono)' }}>{c.code}</b>
                       {c.description && <div style={{ fontSize: 11, color: 'var(--ink-soft)', marginTop: 2 }}>{c.description}</div>}
@@ -221,7 +225,8 @@ export default function CouponsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
+            <Pagination page={page} total={coupons.length} pageSize={PAGE_SIZE} onChange={setPage} label="coupons" />
           </div>
         )}
     </div>

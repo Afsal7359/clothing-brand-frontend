@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
+import Barcode from '@/components/Barcode';
 
 const EMPTY = {
   title: '',
@@ -37,6 +38,7 @@ export default function ProductForm({ initial = null, onSaved }) {
   const [uploadProgress, setUploadProgress] = useState(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     api.collections.list({ active: 'false' }).then((r) => setCollections(r.items || []));
@@ -225,6 +227,38 @@ export default function ProductForm({ initial = null, onSaved }) {
               <input type="checkbox" checked={form.isNew} onChange={(e) => setField('isNew', e.target.checked)} />
               <span style={{ fontSize: 13 }}>Show &quot;New&quot; tag</span>
             </label>
+          </div>
+
+          <div className="admin-card" style={{ marginBottom: 20 }}>
+            <h3 style={{ fontFamily: 'var(--display)', fontSize: 18, textTransform: 'uppercase', marginBottom: 14 }}>Barcode</h3>
+            {initial?.barcode ? (
+              <>
+                <div style={{ background: '#fff', padding: '8px 4px', border: '1px solid var(--line)', borderRadius: 4, textAlign: 'center' }}>
+                  <Barcode value={initial.barcode} width={220} height={68} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+                  <code style={{ fontFamily: 'var(--mono)', fontSize: 12.5, letterSpacing: 0.5, flex: 1 }}>{initial.barcode}</code>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(initial.barcode);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 1500);
+                    }}
+                  >
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+                <p style={{ fontSize: 11.5, color: 'var(--ink-mute)', marginTop: 8, lineHeight: 1.5 }}>
+                  Scannable EAN-13. Used by the billing app to add this product to a bill.
+                </p>
+              </>
+            ) : (
+              <p style={{ fontSize: 12.5, color: 'var(--ink-mute)', lineHeight: 1.5 }}>
+                A unique EAN-13 barcode is generated automatically when you save this product.
+              </p>
+            )}
           </div>
 
           <div className="admin-card" style={{ marginBottom: 20 }}>

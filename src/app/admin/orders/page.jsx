@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api, resolveImage } from '@/lib/api';
+import Pagination from '@/components/Pagination';
 
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 
@@ -36,7 +37,7 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const goPage = (p) => { setPage(p); load(p); };
+  const goPage = (p) => { setPage(p); load(p); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   useEffect(() => { setPage(1); load(1); }, [filter]);
 
@@ -76,7 +77,7 @@ export default function AdminOrdersPage() {
           <div className="empty-state">No orders found.</div>
         ) : (
           <div className="admin-card" style={{ padding: 0 }}>
-            <table className="admin-table">
+            <div className="admin-table-wrap"><table className="admin-table">
               <thead>
                 <tr>
                   <th>Order #</th>
@@ -119,20 +120,11 @@ export default function AdminOrdersPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </div>
         )}
 
-        {/* Pagination */}
-        {total > PAGE_SIZE && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 20, fontFamily: 'var(--mono)', fontSize: 12 }}>
-            <button className="btn" style={{ padding: '6px 14px' }} onClick={() => goPage(page - 1)} disabled={page === 1}>← Prev</button>
-            <span style={{ color: 'var(--ink-soft)' }}>
-              Page {page} of {Math.ceil(total / PAGE_SIZE)} &nbsp;·&nbsp; {total} orders
-            </span>
-            <button className="btn" style={{ padding: '6px 14px' }} onClick={() => goPage(page + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)}>Next →</button>
-          </div>
-        )}
+        <Pagination page={page} total={total} pageSize={PAGE_SIZE} onChange={goPage} label="orders" />
 
         {/* Detail drawer */}
         {selected && (

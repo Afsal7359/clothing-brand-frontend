@@ -15,6 +15,7 @@ export default function AdminSidebar() {
     { href: '/admin/orders', label: 'Orders' },
     { href: '/admin/coupons', label: 'Coupons' },
     { href: '/admin/analytics', label: 'Analytics' },
+  { href: '/admin/billing-users', label: 'Billing Users' },
     { href: '/admin/site', label: 'Site Settings' },
   ];
 

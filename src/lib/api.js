@@ -110,6 +110,14 @@ export const api = {
     me: () => request('/auth/me', { auth: false, userAuth: true }),
     updateProfile: (body) => request('/auth/me', { method: 'PUT', body: JSON.stringify(body), auth: false, userAuth: true }),
   },
+  // Staff logins for the billing app — admin-only CRUD.
+  billingUsers: {
+    list: () => request('/admin/billing-users'),
+    create: (body) => request('/admin/billing-users', { method: 'POST', body: JSON.stringify(body) }),
+    update: (id, body) => request(`/admin/billing-users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+    remove: (id) => request(`/admin/billing-users/${id}`, { method: 'DELETE' }),
+  },
+
   admin: {
     login: (body) => request('/admin/login', { method: 'POST', body: JSON.stringify(body), auth: false }),
     me: () => request('/admin/me'),

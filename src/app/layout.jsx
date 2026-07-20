@@ -32,12 +32,17 @@ const mono = JetBrains_Mono({
 export const metadata = {
   title: 'underdawg — Premium Streetwear',
   description: 'Gender-neutral premium streetwear. London, UK.',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    viewportFit: 'cover',
-  },
+};
+
+// MUST be its own export in Next 14+ — a `viewport` key inside `metadata` is
+// ignored, so no <meta name="viewport"> was emitted at all. Without it mobile
+// browsers assume a ~980px layout viewport and scale the page down, which means
+// no CSS media query ever matches and the site looks like shrunken desktop.
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }) {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
+import Pagination from '@/components/Pagination';
 
 async function uploadOne(file, onProgress) {
   const compressed = await compressImage(file);
@@ -23,6 +24,9 @@ const EMPTY = {
 
 export default function AdminCollectionsPage() {
   const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
+  const paged = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null); // null or collection object
   const [form, setForm] = useState(EMPTY);
@@ -209,7 +213,7 @@ export default function AdminCollectionsPage() {
               </tr>
             </thead>
             <tbody>
-              {items.map((c) => (
+              {paged.map((c) => (
                 <tr key={c._id}>
                   <td>{c.desktopImage && <img src={resolveImage(c.desktopImage)} alt="" />}</td>
                   <td>
@@ -230,6 +234,7 @@ export default function AdminCollectionsPage() {
               ))}
             </tbody>
           </table>
+          <Pagination page={page} total={items.length} pageSize={PAGE_SIZE} onChange={setPage} label="collections" />
         </div>
       )}
     </>

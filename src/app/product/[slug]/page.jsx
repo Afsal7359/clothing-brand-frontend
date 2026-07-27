@@ -67,8 +67,10 @@ export default async function ProductPage({ params }) {
 
         {/* Info panel */}
         <aside className="pdp-info">
+          {/* Show the product's COLLECTION here, not its raw category enum.
+              Falls back to category only if it isn't in any collection yet. */}
           <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 10 }}>
-            {product.category}
+            {product.collections?.[0]?.title || product.category}
           </div>
           <h1 className="pdp-title">{product.title}</h1>
 

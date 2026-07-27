@@ -92,7 +92,7 @@ export default function AdminProductsPage() {
                 <th style={{ width: 60 }}></th>
                 <th>Title</th>
                 <th>Barcode</th>
-                <th>Category</th>
+                <th>Collection</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Status</th>
@@ -116,7 +116,11 @@ export default function AdminProductsPage() {
                         <span style={{ fontSize: 11.5, color: 'var(--ink-mute)' }}>—</span>
                       )}
                     </td>
-                    <td>{p.category}</td>
+                    <td>
+                      {(p.collections || []).length
+                        ? (p.collections || []).map((c) => c.title).filter(Boolean).join(', ')
+                        : <span style={{ color: 'var(--ink-mute)' }}>—</span>}
+                    </td>
                     <td>£{p.price.toLocaleString('en-GB')}</td>
                     <td>
                       <span className={`badge ${stock > 0 ? 'green' : 'red'}`}>{stock}</span>

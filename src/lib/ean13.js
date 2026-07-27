@@ -57,31 +57,43 @@ export function ean13SVG(code, { width = 240, height = 70, showText = true, colo
   const modules = encodeEan13(s);
   if (!modules) return '';
 
-  const QUIET = 11;                    // mandatory quiet zone, in modules
-  const totalModules = 95 + QUIET * 2;
-  const textH = showText ? 10 : 0;
-  const barH = 100 - textH;            // in viewBox units
-  const guardH = barH + (showText ? 5 : 0);
+  // Standard EAN-13 quiet zones: 11 modules left, 7 right. Scanners REQUIRE
+  // this clear margin — without it many readers refuse to decode.
+  const QL = 11, QR = 7;
+  const totalModules = 95 + QL + QR;
+  const barH = 100;
+  const guardDrop = 8;                 // data bars stop short; guards run full
 
-  // Guard positions get the taller bars.
   const isGuard = (i) =>
     (i >= 0 && i < 3) || (i >= 45 && i < 50) || (i >= 92 && i < 95);
 
   let rects = '';
   for (let i = 0; i < 95; i++) {
     if (modules[i] !== '1') continue;
-    rects += `<rect x="${QUIET + i}" y="0" width="1" height="${isGuard(i) ? guardH : barH}" fill="${color}"/>`;
+    rects += `<rect x="${QL + i}" y="0" width="1" height="${isGuard(i) ? barH : barH - guardDrop}" fill="${color}"/>`;
   }
 
-  let text = '';
-  if (showText) {
-    const fs = 9;
-    const y = 100;
-    // 1 digit outside-left, 6 under the left half, 6 under the right half.
-    text += `<text x="${QUIET - 8}" y="${y}" font-size="${fs}" font-family="monospace" fill="${color}">${s[0]}</text>`;
-    text += `<text x="${QUIET + 3 + 21}" y="${y}" font-size="${fs}" font-family="monospace" fill="${color}" text-anchor="middle" letter-spacing="1.5">${s.slice(1, 7)}</text>`;
-    text += `<text x="${QUIET + 50 + 21}" y="${y}" font-size="${fs}" font-family="monospace" fill="${color}" text-anchor="middle" letter-spacing="1.5">${s.slice(7)}</text>`;
-  }
+  // preserveAspectRatio="none" is deliberate: the bars must fill the FULL
+  // requested width. With "meet" the shorter (height) scale wins and the
+  // barcode collapses to ~1px per module — far too fine for any scanner to
+  // read. Every bar scales by the same x-factor, so relative widths (and thus
+  // the encoding) stay correct. crispEdges avoids anti-aliasing the edges,
+  // which also helps decoding.
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalModules} ${barH}"` +
+    ` width="${width}" height="${height}" preserveAspectRatio="none"` +
+    ` shape-rendering="crispEdges" style="display:block">` +
+    `<rect x="0" y="0" width="${totalModules}" height="${barH}" fill="${bg}"/>${rects}</svg>`;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalModules} 105" width="${width}" height="${height}" preserveAspectRatio="xMidYMid meet"><rect x="0" y="0" width="${totalModules}" height="105" fill="${bg}"/>${rects}${text}</svg>`;
+  if (!showText) return svg;
+
+  // Digits are rendered OUTSIDE the stretched SVG so they aren't distorted.
+  const fs = Math.max(9, Math.round(width / 22));
+  return (
+    `<div style="display:inline-block;background:${bg};text-align:center">` +
+    svg +
+    `<div style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:${fs}px;` +
+    `letter-spacing:${Math.max(1, fs / 6)}px;color:${color};margin-top:3px">` +
+    `${s[0]} ${s.slice(1, 7)} ${s.slice(7)}</div></div>`
+  );
 }

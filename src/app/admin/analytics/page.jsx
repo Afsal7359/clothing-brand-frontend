@@ -223,7 +223,7 @@ function SessionDrawer({ sid, onClose }) {
           )}
 
           {/* Stats row */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginTop: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginTop: 14 }}>
             {[
               { l: 'Duration',  v: fmtDuration(durationMs) },
               { l: 'Events',    v: events.length },
@@ -798,7 +798,7 @@ function DevicesTab({ devices }) {
   });
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16 }}>
         {[
           { title: 'Device type', data: devices.devices  || [] },
           { title: 'Browser',     data: devices.browsers || [] },

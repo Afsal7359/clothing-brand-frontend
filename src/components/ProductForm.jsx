@@ -121,7 +121,7 @@ export default function ProductForm({ initial = null, onSaved }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'flex-start' }}>
+      <div className="pf-layout">
         <div>
           <div className="admin-card" style={{ marginBottom: 20 }}>
             <h3 style={{ fontFamily: 'var(--display)', fontSize: 18, textTransform: 'uppercase', marginBottom: 14 }}>Basics</h3>
@@ -178,7 +178,7 @@ export default function ProductForm({ initial = null, onSaved }) {
           <div className="admin-card" style={{ marginBottom: 20 }}>
             <h3 style={{ fontFamily: 'var(--display)', fontSize: 18, textTransform: 'uppercase', marginBottom: 14 }}>Variants &amp; stock</h3>
             {form.variants.map((v, i) => (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, marginBottom: 10 }}>
+              <div key={i} className="pf-variant-row">
                 <input placeholder="Size (S, M, One Size…)" value={v.size} onChange={(e) => updateVariant(i, 'size', e.target.value)} style={{ padding: 10, border: '1px solid var(--line)', borderRadius: 4 }} />
                 <input type="number" min="0" placeholder="Stock" value={v.stock} onChange={(e) => updateVariant(i, 'stock', e.target.value)} style={{ padding: 10, border: '1px solid var(--line)', borderRadius: 4 }} />
                 <button type="button" className="btn-sm" onClick={() => removeVariant(i)} style={{ color: '#991b1b', border: '1px solid var(--line)', borderRadius: 4, padding: '0 12px' }}>Remove</button>
@@ -330,14 +330,6 @@ export default function ProductForm({ initial = null, onSaved }) {
         </aside>
       </div>
 
-      <style jsx>{`
-        @media (max-width: 900px) {
-          form > div[style*="grid-template-columns"] {
-            grid-template-columns: 1fr !important;
-          }
-          aside { position: static !important; }
-        }
-      `}</style>
     </form>
   );
 }

@@ -3847,3 +3847,56 @@ footer.site {
   /* Same reasoning for the desktop two-column shell */
   .admin-shell { grid-template-columns: 240px minmax(0, 1fr); }
 }
+
+/* ==========================================================================
+   RESPONSIVE — product form + site-wide overflow safety net
+   ==========================================================================
+   The single most common cause of "not mobile responsive" here is a grid/flex
+   child with the default min-width:auto, which refuses to shrink below its
+   content and pushes the whole page wider than the screen. These rules make
+   the admin form collapse cleanly and stop any wide child (table, image row,
+   long code) from forcing a horizontal scrollbar. */
+
+.pf-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: flex-start;
+}
+.pf-layout > * { min-width: 0; }          /* let both columns shrink */
+
+.pf-variant-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+  .pf-layout { grid-template-columns: 1fr; gap: 18px; }
+  .pf-layout aside { position: static !important; top: auto !important; }
+}
+
+/* --- generic guards, admin scope only (won't touch the marketing site) --- */
+.admin-main,
+.admin-main * { min-width: 0; }           /* nothing forces the column wide */
+
+.admin-main input,
+.admin-main select,
+.admin-main textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Any card/grid the admin lays out in fixed columns wraps instead of spilling */
+.admin-card { overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .admin-main { padding: 16px 14px; }
+  /* Multi-column stat/summary grids drop to a single column on phones */
+  .stat-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 420px) {
+  .stat-grid { grid-template-columns: 1fr !important; }
+}

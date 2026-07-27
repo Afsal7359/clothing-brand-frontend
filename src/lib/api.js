@@ -118,6 +118,13 @@ export const api = {
     remove: (id) => request(`/admin/billing-users/${id}`, { method: 'DELETE' }),
   },
 
+  notifications: {
+    get: () => request('/admin/notifications'),
+    update: (body) => request('/admin/notifications', { method: 'PATCH', body: JSON.stringify(body) }),
+    test: () => request('/admin/notifications/test', { method: 'POST' }),
+    removeDevice: (id) => request(`/admin/notifications/devices/${id}`, { method: 'DELETE' }),
+  },
+
   admin: {
     login: (body) => request('/admin/login', { method: 'POST', body: JSON.stringify(body), auth: false }),
     me: () => request('/admin/me'),

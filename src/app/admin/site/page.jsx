@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { api, resolveImage } from '@/lib/api';
+import { api, resolveImage, realImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
 
+/* No stand-in image URLs here. These defaults seed the form, and saving the
+   form writes them straight to Settings — a placeholder URL in this object is
+   how a stock photo ended up in the database and on the live hero. */
 const DEFAULT_HERO = {
-  desktop: 'https://picsum.photos/seed/herodesk/1920/1080',
-  mobile: 'https://picsum.photos/seed/heromob/900/1200',
+  desktop: '',
+  mobile: '',
   eyebrow: 'SS26 — Drop 01',
   title: 'Built For The Street',
   ctaLabel: 'Shop the collection',
@@ -54,7 +57,14 @@ export default function AdminSitePage() {
 
   useEffect(() => {
     api.settings.get().then((s) => {
-      if (s.hero) setHero({ ...DEFAULT_HERO, ...s.hero });
+      // realImage() blanks any placeholder URL a previous save persisted, so
+      // the field reads as empty and the next save clears it for good.
+      if (s.hero) setHero({
+        ...DEFAULT_HERO,
+        ...s.hero,
+        desktop: realImage(s.hero.desktop),
+        mobile: realImage(s.hero.mobile),
+      });
       if (s.stories?.length) setStories(s.stories);
       if (s.craft) setCraft({ image: s.craft.image || '', products: s.craft.products || [] });
       if (s.shippingInfo?.length) setShippingInfo(s.shippingInfo);

@@ -161,7 +161,7 @@ export default function ProductForm({ initial = null, onSaved }) {
               </div>
             )}
             <p style={{ fontSize: 11, color: 'var(--ink-soft)', fontFamily: 'var(--mono)', marginTop: 6 }}>
-              Max 5 MB per image — auto-compressed to WebP before upload
+              Any size — auto-resized and compressed to WebP before upload
             </p>
             {form.images.length > 0 && (
               <div className="image-grid">

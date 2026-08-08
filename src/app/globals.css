@@ -594,14 +594,56 @@ header.site {
   background: #0a0a0a;
 }
 
+/* Wrapper holds the frame while the banner loads so the shimmer has height
+   and the page doesn't jump when the image lands. */
+.hero-media {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero-media.mobile {
+  display: none;
+}
+
 .hero-img {
   width: 100%;
   height: auto;
   display: block;
+  transition: opacity 0.45s ease;
 }
 
-.hero-img.mobile {
-  display: none;
+/* Neutral grey stand-in — shimmers only while a load is actually in flight. */
+.hero-skeleton {
+  position: absolute;
+  inset: 0;
+  background: #141414;
+}
+
+.hero-skeleton.is-loading {
+  background: linear-gradient(100deg, #141414 20%, #262626 42%, #141414 64%);
+  background-size: 220% 100%;
+  animation: hero-shimmer 1.5s linear infinite;
+}
+
+@keyframes hero-shimmer {
+  from { background-position: 120% 0; }
+  to   { background-position: -120% 0; }
+}
+
+/* Neutral grey block for any image slot with nothing configured yet.
+   Light-surface equivalent of .hero-skeleton (which sits on the dark hero). */
+.img-skeleton {
+  background-color: #ebebeb;
+  background-image: linear-gradient(100deg, #ebebeb 20%, #f5f5f5 42%, #ebebeb 64%);
+  background-size: 220% 100%;
+  animation: hero-shimmer 1.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-skeleton.is-loading,
+  .img-skeleton { animation: none; }
+  .hero-img { transition: none; }
 }
 
 .hero-content {
@@ -702,11 +744,11 @@ header.site {
 }
 
 @media (max-width: 768px) {
-  .hero-img.desktop {
+  .hero-media.desktop {
     display: none;
   }
 
-  .hero-img.mobile {
+  .hero-media.mobile {
     display: block;
   }
 }
@@ -992,14 +1034,19 @@ header.site {
   display: block;
 }
 
-.discover-card img {
+/* .img-skeleton stands in for a collection image that isn't set yet, so it
+   has to size exactly like the <img> it replaces. */
+.discover-card img,
+.discover-card .img-skeleton {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.8s ease;
 }
 
-.discover-card img.mobile {
+.discover-card img.mobile,
+.discover-card .img-skeleton.mobile {
   display: none;
 }
 
@@ -1101,11 +1148,13 @@ header.site {
     aspect-ratio: auto;
   }
 
-  .discover.swiper-active .discover-card img.desktop {
+  .discover.swiper-active .discover-card img.desktop,
+  .discover.swiper-active .discover-card .img-skeleton.desktop {
     display: none;
   }
 
-  .discover.swiper-active .discover-card img.mobile {
+  .discover.swiper-active .discover-card img.mobile,
+  .discover.swiper-active .discover-card .img-skeleton.mobile {
     display: block;
   }
 

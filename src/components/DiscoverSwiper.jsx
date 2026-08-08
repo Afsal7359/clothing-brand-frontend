@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { resolveImage } from '@/lib/api';
+import { realImage, resolveImage } from '@/lib/api';
 
 export default function DiscoverSwiper({ items = [] }) {
   const router            = useRouter();
@@ -143,8 +143,14 @@ export default function DiscoverSwiper({ items = [] }) {
               if (swiperInstanceRef.current) e.preventDefault();
             }}
           >
-            <img className="desktop" src={resolveImage(c.desktopImage, 1200) || `https://picsum.photos/seed/dc${i}d/1200/1500`} alt="" loading="lazy" decoding="async" />
-            <img className="mobile"  src={resolveImage(c.mobileImage, 900)   || `https://picsum.photos/seed/dc${i}m/900/1400`}  alt="" loading="lazy" decoding="async" />
+            {/* Collection images come from the DB. With none set the card
+                shows its grey frame — never a stock photo. */}
+            {resolveImage(realImage(c.desktopImage), 1200)
+              ? <img className="desktop" src={resolveImage(realImage(c.desktopImage), 1200)} alt="" loading="lazy" decoding="async" />
+              : <span className="desktop img-skeleton" aria-hidden="true" />}
+            {resolveImage(realImage(c.mobileImage), 900)
+              ? <img className="mobile" src={resolveImage(realImage(c.mobileImage), 900)} alt="" loading="lazy" decoding="async" />
+              : <span className="mobile img-skeleton" aria-hidden="true" />}
             <span className="counter">
               {String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
             </span>

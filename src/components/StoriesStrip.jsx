@@ -2,19 +2,11 @@
 
 import Link from 'next/link';
 import { useRef, useEffect } from 'react';
+import { realImage, resolveImage } from '@/lib/api';
 
-const DEFAULT_STORIES = [
-  { label: 'new caps',    image: 'https://picsum.photos/seed/story1/200/200', href: '/collections/caps' },
-  { label: 'polo season', image: 'https://picsum.photos/seed/story2/200/200', href: '/collections/polo-club' },
-  { label: 'dark grid',   image: 'https://picsum.photos/seed/story3/200/200', href: '/collections' },
-  { label: 'new shirts',  image: 'https://picsum.photos/seed/story4/200/200', href: '/collections' },
-  { label: 'ss26 look',   image: 'https://picsum.photos/seed/story5/200/200', href: '/collections' },
-  { label: 'lookbook',    image: 'https://picsum.photos/seed/story6/200/200', href: '/collections' },
-  { label: 'archive',     image: 'https://picsum.photos/seed/story7/200/200', href: '/collections' },
-  { label: 'press',       image: 'https://picsum.photos/seed/story8/200/200', href: '/collections' },
-];
-
-export default function StoriesStrip({ stories = DEFAULT_STORIES }) {
+/* Stories come from Site Settings. No stand-in images — with nothing
+   configured the strip renders nothing rather than stock photos. */
+export default function StoriesStrip({ stories = [] }) {
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -45,13 +37,18 @@ export default function StoriesStrip({ stories = DEFAULT_STORIES }) {
     };
   }, [stories]);
 
+  if (!stories.length) return null;
+
   return (
     <section className="stories" aria-label="Featured stories" ref={scrollRef}>
       <div className="stories-row">
         {stories.map((s, i) => (
           <Link key={i} href={s.href} className="story">
             <div className="story-ring">
-              <div style={{ backgroundImage: `url('${s.image}')` }} />
+              <div
+                className={realImage(s.image) ? undefined : 'img-skeleton'}
+                style={{ backgroundImage: realImage(s.image) ? `url('${resolveImage(s.image, 200)}')` : undefined }}
+              />
             </div>
             <div className="story-label">{s.label}</div>
           </Link>

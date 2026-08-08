@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import ProductCard from '@/components/ProductCard';
-
-const DEFAULT_IMAGE = 'https://picsum.photos/seed/craft/800/500';
+import { realImage, resolveImage } from '@/lib/api';
 
 export default function Craft({ craft }) {
   const [open, setOpen] = useState(false);
-  const image    = craft?.image    || DEFAULT_IMAGE;
+  // No stand-in photo: an unset craft image shows the neutral panel below.
+  const image    = resolveImage(realImage(craft?.image));
   const products = craft?.products || [];
 
   return (
@@ -23,12 +23,15 @@ export default function Craft({ craft }) {
             onClick={() => setOpen(true)}
             style={{ border: '1px solid var(--line)', overflow: 'hidden', background: '#fff', borderRadius: 4, cursor: 'pointer' }}
           >
-            <div style={{
-              aspectRatio: '16 / 10',
-              backgroundImage: `url('${image}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }} />
+            <div
+              className={image ? undefined : 'img-skeleton'}
+              style={{
+                aspectRatio: '16 / 10',
+                backgroundImage: image ? `url('${image}')` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
           </article>
         </div>
       </section>

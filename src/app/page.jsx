@@ -60,12 +60,14 @@ export default async function HomePage() {
       <CartDrawer />
 
       <div data-section="hero">
+        {/* Passed straight through — Hero has no stand-in image to fall back
+            to, so a failed /settings fetch shows a shimmer, not a stock photo. */}
         <Hero
-          desktop={hero.desktop  || undefined}
-          mobile={hero.mobile    || undefined}
-          eyebrow={hero.eyebrow  || undefined}
-          title={hero.title      || undefined}
-          cta={hero.ctaLabel ? { label: hero.ctaLabel, href: hero.ctaHref || '/collections' } : undefined}
+          desktop={hero.desktop}
+          mobile={hero.mobile}
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          cta={hero.ctaLabel ? { label: hero.ctaLabel, href: hero.ctaHref || '/collections' } : null}
         />
       </div>
 

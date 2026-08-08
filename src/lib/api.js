@@ -59,6 +59,17 @@ export function resolveImage(src, width) {
   return url;
 }
 
+/* Placeholder-service URLs count as "no image".
+   Earlier builds seeded the admin Hero form with a picsum stub, so saving that
+   form before uploading a banner persisted a stock photo into Settings. This
+   keeps any such saved stub from rendering without a database clean-up. */
+const PLACEHOLDER_HOST = /(picsum\.photos|placehold(er)?\.(co|it|com)|via\.placeholder|dummyimage|loremflickr|unsplash\.it|placekitten)/i;
+
+export function realImage(src) {
+  const s = typeof src === 'string' ? src.trim() : '';
+  return s && !PLACEHOLDER_HOST.test(s) ? s : '';
+}
+
 // Cached read: 60s server-side data cache for public storefront content.
 const READ = { next: { revalidate: 60 } };
 

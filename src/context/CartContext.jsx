@@ -13,8 +13,11 @@ function reducer(state, action) {
       return action.payload || [];
     case 'ADD': {
       const { item } = action;
-      const key = `${item.productId}:${item.size || ''}`;
-      const idx = state.findIndex((l) => `${l.productId}:${l.size || ''}` === key);
+      // Colour is part of the identity: the same product in two colours must
+      // stay two lines, not merge into one with a doubled quantity.
+      const lineKey = (l) => `${l.productId}:${l.size || ''}:${l.color || ''}`;
+      const key = lineKey(item);
+      const idx = state.findIndex((l) => lineKey(l) === key);
       if (idx >= 0) {
         const next = [...state];
         next[idx] = { ...next[idx], quantity: next[idx].quantity + (item.quantity || 1) };
@@ -67,6 +70,7 @@ export function CartProvider({ children }) {
         title:     item.title,
         price:     item.price,
         size:      item.size || '',
+        color:     item.color || '',
       });
     }
   };

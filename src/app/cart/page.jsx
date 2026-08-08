@@ -183,7 +183,7 @@ export default function CartPage() {
   };
 
   const buildOrderPayload = (paymentIntentId = '') => ({
-    items: items.map((it) => ({ product: it.productId, quantity: it.quantity, size: it.size })),
+    items: items.map((it) => ({ product: it.productId, quantity: it.quantity, size: it.size, color: it.color || '' })),
     shippingAddress: {
       fullName: form.fullName, phone: form.phone,
       line1: form.line1, line2: form.line2,
@@ -292,7 +292,7 @@ export default function CartPage() {
                     <img src={resolveImage(it.image)} alt={it.title} />
                     <div>
                       <div className="cart-item-title">{it.title}</div>
-                      <div className="cart-item-meta">{it.size ? `Size: ${it.size} · ` : ''}£{it.price.toLocaleString('en-GB')}</div>
+                      <div className="cart-item-meta">{it.size ? `Size: ${it.size} · ` : ''}{it.color ? `${it.color} · ` : ''}£{it.price.toLocaleString('en-GB')}</div>
                       <div className="qty">
                         <button onClick={() => update(i, it.quantity - 1)}>−</button>
                         <span>{it.quantity}</span>

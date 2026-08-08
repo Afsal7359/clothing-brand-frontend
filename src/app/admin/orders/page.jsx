@@ -178,7 +178,7 @@ export default function AdminOrdersPage() {
                       {it.image && <img src={resolveImage(it.image)} alt="" style={{ width: 56, height: 70, objectFit: 'cover', borderRadius: 2 }} />}
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 500 }}>{it.title}</div>
-                        <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{it.size ? `Size: ${it.size} · ` : ''}Qty: {it.quantity}</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{it.size ? `Size: ${it.size} · ` : ''}{it.color ? `Colour: ${it.color} · ` : ''}Qty: {it.quantity}</div>
                       </div>
                       <div style={{ fontSize: 13, fontFamily: 'var(--mono)' }}>£{(it.price * it.quantity).toLocaleString('en-GB')}</div>
                     </div>

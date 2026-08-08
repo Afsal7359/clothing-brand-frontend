@@ -110,19 +110,8 @@ export default async function ProductPage({ params }) {
             </div>
           )}
 
-          {/* Colors */}
-          {product.colors?.length > 0 && (
-            <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--line)' }}>
-              <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 10 }}>
-                Available colours
-              </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {product.colors.map((c) => (
-                  <span key={c} style={{ fontSize: 12, color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: 2, padding: '3px 10px' }}>{c}</span>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Colours are chosen in <ProductActions> above, next to size —
+              a read-only list here would just duplicate that selector. */}
 
           {/* Shipping & returns */}
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: '1px solid var(--line)', fontSize: 13, lineHeight: 2, color: 'var(--ink-soft)' }}>

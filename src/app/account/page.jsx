@@ -126,7 +126,7 @@ export default function AccountPage() {
                           {item.image && <img src={resolveImage(item.image)} alt={item.title} style={{ width: 48, height: 60, objectFit: 'cover', borderRadius: 2 }} />}
                           <div>
                             <p style={{ fontSize: 13, fontWeight: 500 }}>{item.title}</p>
-                            <p style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Qty {item.quantity}{item.size ? ` · ${item.size}` : ''}</p>
+                            <p style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Qty {item.quantity}{item.size ? ` · ${item.size}` : ''}{item.color ? ` · ${item.color}` : ''}</p>
                           </div>
                         </div>
                       ))}

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import * as XLSX from 'xlsx';
 import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
+import TagInput from '@/components/TagInput';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
@@ -641,16 +642,16 @@ export default function BulkUploadPage() {
 
                 <div className="bulk-review-row" style={{ marginTop: 8 }}>
                   <div className="bulk-review-field">
-                    <label>Colors (comma-separated)</label>
-                    <input value={(r.colors || []).join(', ')}
-                      onChange={(e) => updateRow(r.id, { colors: parseCSV(e.target.value) })}
-                      placeholder="Black, White, Navy" disabled={r.done} />
+                    <label>Colours</label>
+                    <TagInput value={r.colors || []}
+                      onChange={(v) => updateRow(r.id, { colors: v })}
+                      placeholder="Type a colour, press Enter" disabled={r.done} />
                   </div>
                   <div className="bulk-review-field">
-                    <label>Tags (comma-separated)</label>
-                    <input value={(r.tags || []).join(', ')}
-                      onChange={(e) => updateRow(r.id, { tags: parseCSV(e.target.value) })}
-                      placeholder="cotton, oversized" disabled={r.done} />
+                    <label>Tags</label>
+                    <TagInput value={r.tags || []}
+                      onChange={(v) => updateRow(r.id, { tags: v })}
+                      placeholder="Type a tag, press Enter" disabled={r.done} />
                   </div>
                 </div>
 

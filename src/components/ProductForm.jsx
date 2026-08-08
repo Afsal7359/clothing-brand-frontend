@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api, resolveImage } from '@/lib/api';
 import { compressImage } from '@/lib/imageUtils';
 import Barcode from '@/components/Barcode';
+import TagInput from '@/components/TagInput';
 
 const EMPTY = {
   title: '',
@@ -190,19 +191,20 @@ export default function ProductForm({ initial = null, onSaved }) {
           <div className="admin-card">
             <h3 style={{ fontFamily: 'var(--display)', fontSize: 18, textTransform: 'uppercase', marginBottom: 14 }}>Metadata</h3>
             <div className="field">
-              <label>Colors (comma separated)</label>
-              <input
-                value={Array.isArray(form.colors) ? form.colors.join(', ') : form.colors}
-                onChange={(e) => setField('colors', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))}
-                placeholder="Black, White"
+              <label>Colours</label>
+              <TagInput
+                value={Array.isArray(form.colors) ? form.colors : []}
+                onChange={(v) => setField('colors', v)}
+                placeholder="Type a colour, press Enter"
               />
+              <p className="field-hint">Shoppers pick one of these on the product page before adding to bag.</p>
             </div>
             <div className="field">
-              <label>Tags (comma separated)</label>
-              <input
-                value={Array.isArray(form.tags) ? form.tags.join(', ') : form.tags}
-                onChange={(e) => setField('tags', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))}
-                placeholder="oversized, drop1"
+              <label>Tags</label>
+              <TagInput
+                value={Array.isArray(form.tags) ? form.tags : []}
+                onChange={(v) => setField('tags', v)}
+                placeholder="Type a tag, press Enter"
               />
             </div>
           </div>

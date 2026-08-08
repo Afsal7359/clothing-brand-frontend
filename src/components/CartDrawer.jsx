@@ -37,7 +37,7 @@ export default function CartDrawer() {
                   <div>
                     <div className="cart-item-title">{it.title}</div>
                     <div className="cart-item-meta">
-                      {it.size ? `Size: ${it.size} · ` : ''}£{it.price.toLocaleString('en-GB')}
+                      {it.size ? `Size: ${it.size} · ` : ''}{it.color ? `${it.color} · ` : ''}£{it.price.toLocaleString('en-GB')}
                     </div>
                     <div className="qty">
                       <button onClick={() => update(i, it.quantity - 1)} aria-label="Decrease">−</button>
